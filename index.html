@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RetailPool AI — Радар по нишам Kaspi.kz</title>
+<link rel="stylesheet" href="assets/style.css">
+<style>
+/* ── HERO ──────────────────────────────────────────────────── */
+.hero {
+  padding-top: 100px; padding-bottom: 5rem;
+  display: grid; grid-template-columns: 1.05fr 1fr;
+  gap: 4rem; align-items: center;
+  max-width: 1180px; margin: 0 auto; padding-left: 1.5rem; padding-right: 1.5rem;
+}
+.hero-live-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--green-bg); color: var(--green-text);
+  border: 1px solid rgba(16,185,129,0.25);
+  padding: 5px 14px; border-radius: 100px;
+  font-size: 12px; font-weight: 600; margin-bottom: 1.5rem;
+}
+.badge-dot {
+  width: 6px; height: 6px; border-radius: 50%; background: var(--green);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
+.hero h1 {
+  font-size: clamp(2.6rem, 5vw, 3.9rem);
+  font-weight: 700; line-height: 1.1;
+  margin-bottom: 1.25rem;
+}
+.hero h1 .accent {
+  background: linear-gradient(135deg, var(--brand) 0%, var(--purple) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.hero-desc {
+  font-size: 1.1rem; color: var(--text-2); line-height: 1.75;
+  max-width: 480px; margin-bottom: 2rem;
+}
+.hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 2.5rem; }
+.hero-ctas .btn-primary { padding: 14px 28px; font-size: 15px; }
+.hero-ctas .btn-secondary { padding: 14px 24px; font-size: 15px; }
+.hero-stats { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+.hero-stat-divider { width: 1px; background: var(--border); }
+.hero-stat-num {
+  font-family: var(--font-display); font-size: 1.9rem; font-weight: 700;
+  color: var(--text); line-height: 1;
+}
+.hero-stat-num .accent-num { color: var(--brand); }
+.hero-stat-label { font-size: 12px; color: var(--text-3); margin-top: 4px; }
+
+/* ── HERO VISUAL ───────────────────────────────────────────── */
+.hero-visual { position: relative; }
+.hero-img-wrap {
+  border-radius: var(--radius-xl); overflow: hidden;
+  aspect-ratio: 4/3.2; position: relative;
+  box-shadow: var(--shadow-lg);
+}
+.hero-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+.hero-img-gradient {
+  position: absolute; inset: 0;
+  background: linear-gradient(to bottom right, rgba(37,99,235,0.07), transparent 60%);
+}
+.hero-float-card {
+  position: absolute; background: #fff;
+  border: 1px solid var(--border); border-radius: 16px;
+  padding: 14px 18px; box-shadow: var(--shadow-lg);
+}
+.hero-float-card.card-bottom {
+  bottom: -18px; left: -22px;
+  display: flex; align-items: center; gap: 12px; min-width: 210px;
+}
+.hero-float-card.card-top {
+  top: -18px; right: -18px; min-width: 190px;
+}
+.float-icon {
+  width: 40px; height: 40px; border-radius: 11px;
+  background: var(--green-bg); display: flex; align-items: center;
+  justify-content: center; flex-shrink: 0; font-size: 18px;
+}
+.float-title { font-size: 13px; font-weight: 700; color: var(--text); }
+.float-sub { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+.niche-row { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
+.niche-row:last-child { margin-bottom: 0; }
+.niche-name { font-size: 12px; color: var(--text-2); font-weight: 500; flex: 1; }
+.niche-up { font-size: 12px; font-weight: 700; color: var(--green); }
+
+/* ── MARQUEE ───────────────────────────────────────────────── */
+.marquee-strip {
+  border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+  padding: 1rem 0; overflow: hidden; background: var(--bg-2);
+}
+.marquee-track {
+  display: flex; gap: 2.5rem; white-space: nowrap;
+  animation: marquee 36s linear infinite;
+}
+.marquee-item {
+  display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+  font-size: 13px; font-weight: 600; color: var(--text-3);
+  text-transform: uppercase; letter-spacing: 0.06em;
+}
+.marquee-item-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--brand); opacity: 0.5; }
+@keyframes marquee { to { transform: translateX(-50%); } }
+
+/* ── STATS BAR ─────────────────────────────────────────────── */
+.stats-bar { background: var(--bg-2); padding: 3.5rem 0; }
+.stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 0; }
+.stat-item {
+  text-align: center; padding: 1.5rem 1rem;
+  border-right: 1px solid var(--border);
+}
+.stat-item:last-child { border-right: none; }
+.stat-num {
+  font-family: var(--font-display); font-size: 2.6rem; font-weight: 700;
+  color: var(--text); letter-spacing: -0.03em; line-height: 1;
+}
+.stat-num sup { font-size: 1.4rem; color: var(--brand); }
+.stat-label { font-size: 13px; color: var(--text-3); margin-top: 6px; }
+
+/* ── HOW IT WORKS ──────────────────────────────────────────── */
+.section { padding: 5.5rem 0; }
+.section-alt { background: var(--bg-2); }
+.steps-wrap { margin-top: 3.5rem; display: flex; flex-direction: column; gap: 0; }
+.step-row {
+  display: grid; grid-template-columns: 80px 1fr 1.4fr;
+  gap: 2.5rem; padding: 2.25rem 0;
+  border-top: 1px solid var(--border); align-items: center;
+}
+.step-row:last-child { border-bottom: 1px solid var(--border); }
+.step-num-badge {
+  width: 52px; height: 52px; border-radius: 14px;
+  background: var(--brand-light); color: var(--brand);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-size: 1.1rem; font-weight: 700;
+}
+.step-info h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem; }
+.step-info p { font-size: 14px; color: var(--text-2); line-height: 1.65; max-width: 320px; }
+.step-visual {
+  height: 96px; border-radius: var(--radius);
+  background: var(--bg-3); border: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 1.5rem; gap: 1rem;
+  overflow: hidden; position: relative;
+}
+.sv-photo { width: 100%; height: 100%; object-fit: cover; border-radius: var(--radius); position: absolute; inset: 0; opacity: 0.35; }
+.sv-content { position: relative; display: flex; align-items: center; gap: 1rem; z-index: 1; }
+.sv-bars { display: flex; align-items: flex-end; gap: 3px; height: 44px; }
+.sv-bar { width: 7px; border-radius: 3px 3px 0 0; background: var(--bg-3); }
+.sv-bar.hi { background: var(--brand); }
+.sv-bar.mid { background: var(--brand); opacity: 0.5; }
+.sv-readout { font-size: 13px; color: var(--text-2); }
+.sv-readout strong { display: block; font-family: var(--font-display); font-size: 1.3rem; color: var(--brand); }
+.sv-cards { display: flex; gap: 5px; }
+.sv-card {
+  width: 32px; height: 44px; border-radius: 5px;
+  background: var(--bg); border: 1px solid var(--border);
+}
+.sv-card.weak { border-color: rgba(239,68,68,0.4); background: var(--red-bg); }
+.sv-progress { flex: 1; height: 8px; background: var(--bg); border-radius: 100px; overflow: hidden; border: 1px solid var(--border); }
+.sv-progress-fill { height: 100%; width: 72%; background: linear-gradient(90deg, var(--brand), var(--purple)); border-radius: 100px; }
+
+/* ── FEATURES GRID ─────────────────────────────────────────── */
+.features-hdr {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 3rem; align-items: end; margin-bottom: 3rem;
+}
+.features-grid {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem;
+}
+.feat-card {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 1.75rem;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.feat-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+.feat-icon {
+  width: 48px; height: 48px; border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; margin-bottom: 1.25rem;
+}
+.feat-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; }
+.feat-card p { font-size: 13.5px; color: var(--text-2); line-height: 1.65; }
+.feat-new {
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+  background: var(--brand-light); color: var(--brand);
+  border-radius: 4px; padding: 2px 7px; margin-left: 6px; vertical-align: middle;
+}
+
+/* ── RESULTS / PHOTO SPLIT ─────────────────────────────────── */
+.split-layout {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center;
+}
+.split-photo {
+  border-radius: var(--radius-xl); overflow: hidden;
+  aspect-ratio: 3/4; position: relative; box-shadow: var(--shadow-lg);
+}
+.split-photo img { width: 100%; height: 100%; object-fit: cover; }
+.split-photo-overlay {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: linear-gradient(to top, rgba(15,23,42,0.88), transparent 55%);
+  padding: 2rem 1.75rem;
+}
+.photo-quote { font-size: 14px; color: #fff; font-style: italic; line-height: 1.65; margin-bottom: 10px; }
+.photo-author { font-size: 12px; color: rgba(255,255,255,0.6); font-weight: 600; }
+.results-list { margin-top: 2.25rem; display: flex; flex-direction: column; gap: 1rem; }
+.result-item {
+  display: flex; gap: 14px; align-items: flex-start;
+  padding: 1.25rem; background: var(--bg-2);
+  border: 1px solid var(--border); border-radius: var(--radius);
+}
+.result-item-icon {
+  width: 40px; height: 40px; border-radius: 11px;
+  background: var(--green-bg); display: flex; align-items: center;
+  justify-content: center; font-size: 18px; flex-shrink: 0;
+}
+.result-item h4 { font-size: 14px; font-weight: 700; margin-bottom: 3px; }
+.result-item p { font-size: 13px; color: var(--text-2); }
+
+/* ── TESTIMONIALS ──────────────────────────────────────────── */
+.testi-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; margin-top: 3rem; }
+.testi-card {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 1.75rem;
+  display: flex; flex-direction: column;
+}
+.testi-stars { color: var(--amber); font-size: 14px; letter-spacing: 1px; margin-bottom: 1rem; }
+.testi-text { font-size: 14px; color: var(--text); line-height: 1.72; flex: 1; margin-bottom: 1.25rem; }
+.testi-author { display: flex; align-items: center; gap: 12px; }
+.testi-avatar {
+  width: 40px; height: 40px; border-radius: 50%;
+  overflow: hidden; flex-shrink: 0; background: var(--bg-3);
+}
+.testi-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.testi-name { font-size: 14px; font-weight: 700; }
+.testi-role { font-size: 12px; color: var(--text-3); }
+
+/* ── CTA BANNER ────────────────────────────────────────────── */
+.cta-wrap { padding: 5.5rem 0; }
+.cta-box {
+  background: linear-gradient(135deg, #0F172A 0%, #1E3A5F 60%, #1A1040 100%);
+  border-radius: var(--radius-xl); padding: 5rem 3rem;
+  text-align: center; position: relative; overflow: hidden;
+}
+.cta-box::before {
+  content: ''; position: absolute;
+  width: 700px; height: 700px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(37,99,235,0.25) 0%, transparent 65%);
+  top: -300px; right: -200px; pointer-events: none;
+}
+.cta-box::after {
+  content: ''; position: absolute;
+  width: 500px; height: 500px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(124,58,237,0.18) 0%, transparent 65%);
+  bottom: -200px; left: -150px; pointer-events: none;
+}
+.cta-box h2 {
+  font-size: clamp(1.9rem, 4vw, 3rem); color: #fff;
+  margin-bottom: 1rem; position: relative; z-index: 1;
+}
+.cta-box p {
+  font-size: 1.05rem; color: rgba(255,255,255,0.62);
+  max-width: 500px; margin: 0 auto 2.5rem; line-height: 1.7;
+  position: relative; z-index: 1;
+}
+.cta-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; position: relative; z-index: 1; }
+.btn-white {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: #fff; color: var(--brand);
+  padding: 14px 28px; border-radius: 12px;
+  font-size: 15px; font-weight: 700; border: none; cursor: pointer;
+  font-family: var(--font-body); transition: opacity 0.15s, transform 0.1s;
+}
+.btn-white:hover { opacity: 0.92; transform: translateY(-1px); }
+.btn-ghost-white {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.1); color: #fff;
+  padding: 14px 26px; border-radius: 12px;
+  font-size: 15px; font-weight: 600; border: 1px solid rgba(255,255,255,0.22); cursor: pointer;
+  font-family: var(--font-body); transition: background 0.15s;
+}
+.btn-ghost-white:hover { background: rgba(255,255,255,0.18); }
+
+/* ── RESPONSIVE ────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .hero { grid-template-columns: 1fr; gap: 2.5rem; padding-top: 88px; }
+  .hero-visual { order: -1; }
+  .hero-float-card { display: none; }
+  .stats-grid { grid-template-columns: repeat(2,1fr); }
+  .stat-item:nth-child(2) { border-right: none; }
+  .step-row { grid-template-columns: 1fr; gap: 1rem; }
+  .step-num-badge { width: 38px; height: 38px; font-size: 0.9rem; }
+  .features-hdr { grid-template-columns: 1fr; gap: 1rem; }
+  .features-grid { grid-template-columns: 1fr 1fr; }
+  .split-layout { grid-template-columns: 1fr; }
+  .testi-grid { grid-template-columns: 1fr 1fr; }
+  .cta-box { padding: 3.5rem 1.5rem; }
+}
+@media (max-width: 600px) {
+  .features-grid { grid-template-columns: 1fr; }
+  .testi-grid { grid-template-columns: 1fr; }
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .stat-item { border-right: none; border-bottom: 1px solid var(--border); padding: 1.25rem 0.75rem; }
+  .stat-item:last-child { border-bottom: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">RetailPool AI</a>
+    <div class="nav-links" id="navLinks">
+      <a href="index.html" class="active" data-i="nav_home">Главная</a>
+      <a href="scanner.html" data-i="nav_scanner">Сканер</a>
+      <a href="pools.html" data-i="nav_pools">Пулы</a>
+      <a href="pricing.html" data-i="nav_pricing">Тарифы</a>
+    </div>
+    <div class="nav-right">
+      <div class="lang-switch">
+        <button class="lang-btn active" data-lang="ru" onclick="rpSetLang('ru')">RU</button>
+        <button class="lang-btn" data-lang="en" onclick="rpSetLang('en')">EN</button>
+      </div>
+      <a href="auth.html?view=login" class="btn-secondary" style="padding:9px 18px;font-size:14px;" data-i="nav_login">Войти</a>
+      <a href="auth.html?view=register" class="btn-primary" style="padding:9px 18px;font-size:14px;" data-i="nav_register">Регистрация</a>
+      <button class="nav-burger" onclick="rpToggleMobileNav()" aria-label="Меню">☰</button>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="container">
+  <div class="hero">
+    <div data-reveal>
+      <div class="hero-live-badge">
+        <span class="badge-dot"></span>
+        <span data-i="hero_badge">Live · Kaspi.kz · 24/7 сканирование</span>
+      </div>
+      <h1 data-i="hero_h1">Радар находит<br><span class="accent">слабые ниши</span><br>раньше вас</h1>
+      <p class="hero-desc" data-i="hero_sub">RetailPool AI непрерывно сканирует Kaspi.kz, вычисляет индекс монополизации каждой категории и находит товары, где конкуренты слабы — а спрос высок.</p>
+      <div class="hero-ctas">
+        <a href="scanner.html" class="btn-primary" data-i="hero_cta1">Запустить сканер →</a>
+        <a href="#how" class="btn-secondary" data-i="hero_cta2">Как это работает</a>
+      </div>
+      <div class="hero-stats">
+        <div>
+          <div class="hero-stat-num">214<span class="accent-num">+</span></div>
+          <div class="hero-stat-label" data-i="stat1_label">Категорий в радаре</div>
+        </div>
+        <div class="hero-stat-divider"></div>
+        <div>
+          <div class="hero-stat-num">37</div>
+          <div class="hero-stat-label" data-i="stat2_label">Уязвимых ниш сейчас</div>
+        </div>
+        <div class="hero-stat-divider"></div>
+        <div>
+          <div class="hero-stat-num">3–5<span class="accent-num" style="font-size:1.2rem">%</span></div>
+          <div class="hero-stat-label" data-i="stat3_label">Success Fee</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-visual" data-reveal>
+      <div class="hero-img-wrap">
+        <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=900&q=85&auto=format&fit=crop" alt="Продавец Kaspi.kz" />
+        <div class="hero-img-gradient"></div>
+      </div>
+      <div class="hero-float-card card-bottom">
+        <div class="float-icon">📈</div>
+        <div>
+          <div class="float-title" data-i="fc1_title">Увлажнители воздуха</div>
+          <div class="float-sub" data-i="fc1_sub">Монополизация 0.82 · Спрос ↑68%</div>
+        </div>
+      </div>
+      <div class="hero-float-card card-top">
+        <div class="niche-row">
+          <span class="pill pill-green"><span class="pill-dot"></span><span data-i="fc2_open">Открыта</span></span>
+          <span class="niche-name" data-i="fc2_n1">Детские игрушки</span>
+          <span class="niche-up">↑212%</span>
+        </div>
+        <div class="niche-row">
+          <span class="pill pill-amber"><span data-i="fc2_hot">Горячая</span></span>
+          <span class="niche-name" data-i="fc2_n2">Наушники TWS</span>
+          <span class="niche-up" style="color:var(--amber)">↑88%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MARQUEE -->
+<div class="marquee-strip">
+  <div class="marquee-track" id="marqueeTrack"></div>
+</div>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-item" data-reveal>
+        <div class="stat-num">214<sup>+</sup></div>
+        <div class="stat-label" data-i="s1">Категорий Kaspi.kz на радаре</div>
+      </div>
+      <div class="stat-item" data-reveal>
+        <div class="stat-num">₸2.4<sup>M</sup></div>
+        <div class="stat-label" data-i="s2">Средний доп. доход участника</div>
+      </div>
+      <div class="stat-item" data-reveal>
+        <div class="stat-num">340<sup>+</sup></div>
+        <div class="stat-label" data-i="s3">Активных продавцов в пулах</div>
+      </div>
+      <div class="stat-item" data-reveal>
+        <div class="stat-num">3–5<sup>%</sup></div>
+        <div class="stat-label" data-i="s4">Success Fee — только с прибыли</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section class="section" id="how">
+  <div class="container">
+    <div class="section-tag" data-i="how_tag">Процесс</div>
+    <h2 class="section-title" data-i="how_title">От сигнала до полки магазина</h2>
+    <p class="section-sub" data-i="how_sub">Четыре шага — от обнаружения ниши до товара, готового к продаже на трёх маркетплейсах.</p>
+
+    <div class="steps-wrap">
+      <div class="step-row" data-reveal>
+        <div class="step-num-badge">01</div>
+        <div class="step-info">
+          <h3 data-i="step1_h">Scouting Engine</h3>
+          <p data-i="step1_p">ИИ парсит категории Kaspi.kz и считает индекс монополизации — соотношение спроса к числу активных продавцов.</p>
+        </div>
+        <div class="step-visual">
+          <img class="sv-photo" src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=500&q=60&auto=format&fit=crop" alt="" />
+          <div class="sv-content">
+            <div class="sv-bars">
+              <div class="sv-bar" style="height:30%"></div>
+              <div class="sv-bar mid" style="height:55%"></div>
+              <div class="sv-bar" style="height:40%"></div>
+              <div class="sv-bar hi" style="height:85%"></div>
+              <div class="sv-bar" style="height:35%"></div>
+              <div class="sv-bar mid" style="height:60%"></div>
+              <div class="sv-bar hi" style="height:95%"></div>
+            </div>
+            <div class="sv-readout"><strong>0.82</strong><span data-i="pv1">monop. index</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step-row" data-reveal>
+        <div class="step-num-badge">02</div>
+        <div class="step-info">
+          <h3 data-i="step2_h">Визуальный аудит</h3>
+          <p data-i="step2_p">Алгоритм проверяет фото, описания и отзывы конкурентов в топе — слабые карточки помечаются как точка входа.</p>
+        </div>
+        <div class="step-visual">
+          <img class="sv-photo" src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=500&q=60&auto=format&fit=crop" alt="" />
+          <div class="sv-content">
+            <div class="sv-cards">
+              <div class="sv-card weak"></div>
+              <div class="sv-card weak"></div>
+              <div class="sv-card"></div>
+              <div class="sv-card weak"></div>
+            </div>
+            <div class="sv-readout"><strong style="color:var(--red)">3/4</strong><span data-i="pv2">слабых карточки</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step-row" data-reveal>
+        <div class="step-num-badge">03</div>
+        <div class="step-info">
+          <h3 data-i="step3_h">Co-Buying пул</h3>
+          <p data-i="step3_p">Платформа открывает пул, продавцы присоединяются, бот генерирует счета для оплаты через Kaspi Pay.</p>
+        </div>
+        <div class="step-visual">
+          <img class="sv-photo" src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=500&q=60&auto=format&fit=crop" alt="" />
+          <div class="sv-content" style="width:100%">
+            <div style="flex:1">
+              <div class="sv-progress"><div class="sv-progress-fill"></div></div>
+            </div>
+            <div class="sv-readout"><strong>12</strong><span data-i="pv3">участников</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step-row" data-reveal>
+        <div class="step-num-badge">04</div>
+        <div class="step-info">
+          <h3 data-i="step4_h">Мультиканальный выход</h3>
+          <p data-i="step4_p">Готовые карточки и инфографика для Kaspi, Wildberries и Ozon — выходите в топ с первого дня.</p>
+        </div>
+        <div class="step-visual">
+          <img class="sv-photo" src="https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=500&q=60&auto=format&fit=crop" alt="" />
+          <div class="sv-content">
+            <div class="sv-cards">
+              <div class="sv-card" style="border-color:var(--brand);box-shadow:0 0 8px rgba(37,99,235,0.3)"></div>
+              <div class="sv-card" style="border-color:var(--brand);box-shadow:0 0 8px rgba(37,99,235,0.3)"></div>
+              <div class="sv-card" style="border-color:var(--brand);box-shadow:0 0 8px rgba(37,99,235,0.3)"></div>
+            </div>
+            <div class="sv-readout"><strong data-i="pv4_val">Kaspi+WB</strong><span data-i="pv4">+Ozon</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section section-alt">
+  <div class="container">
+    <div class="features-hdr">
+      <div>
+        <div class="section-tag" data-i="feat_tag">Возможности</div>
+        <h2 class="section-title" data-i="feat_title">Полный инструментарий разведки рынка</h2>
+      </div>
+      <div>
+        <p class="section-sub" data-i="feat_sub">Каждый модуль решает конкретную задачу — от поиска ниши до выхода на полку маркетплейса.</p>
+        <a href="scanner.html" class="btn-primary" style="margin-top:1.25rem; display:inline-flex;">Попробовать бесплатно →</a>
+      </div>
+    </div>
+    <div class="features-grid">
+      <div class="feat-card" data-reveal>
+        <div class="feat-icon" style="background:#EFF6FF;">🔍</div>
+        <h3>Kaspi Niche Scanner <span class="feat-new">New</span></h3>
+        <p data-i="f1_p">Анализ спроса и предложения по каждой категории — находим монополизируемые ниши с конкурентами-новичками.</p>
+      </div>
+      <div class="feat-card" data-reveal>
+        <div class="feat-icon" style="background:#F0FDF4;">📊</div>
+        <h3 data-i="f2_h">Визуальный аудит карточек</h3>
+        <p data-i="f2_p">Оценка фото, отзывов и описаний конкурентов. Слабая карточка в топе — ваша точка входа.</p>
+      </div>
+      <div class="feat-card" data-reveal>
+        <div class="feat-icon" style="background:#FFFBEB;">🤝</div>
+        <h3 data-i="f3_h">Синдикат закупок</h3>
+        <p data-i="f3_p">Объединяйтесь с другими продавцами и закупайте по цене крупного опта без миллионных вложений.</p>
+      </div>
+      <div class="feat-card" data-reveal>
+        <div class="feat-icon" style="background:#FDF4FF;">🏪</div>
+        <h3 data-i="f4_h">Офлайн + Онлайн аналитика</h3>
+        <p data-i="f4_p">Остатки офлайн-магазинов и онлайн-сигналы Kaspi — в одном дашборде.</p>
+      </div>
+      <div class="feat-card" data-reveal>
+        <div class="feat-icon" style="background:#F0F9FF;">✈️</div>
+        <h3 data-i="f5_h">Telegram-бот</h3>
+        <p data-i="f5_p">Инсайты, алерты о новых нишах и документы для пулов — прямо в Telegram.</p>
+      </div>
+      <div class="feat-card" data-reveal>
+        <div class="feat-icon" style="background:#FFF7ED;">🎨</div>
+        <h3 data-i="f6_h">Дизайн карточек «под ключ»</h3>
+        <p data-i="f6_p">Автогенерация карточек товара для Kaspi, WB и Ozon с инфографикой — готовы к продаже сразу.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RESULTS -->
+<section class="section">
+  <div class="container">
+    <div class="split-layout">
+      <div class="split-photo" data-reveal>
+        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=700&q=85&auto=format&fit=crop&crop=face" alt="Продавец Kaspi, Казахстан" />
+        <div class="split-photo-overlay">
+          <p class="photo-quote" data-i="quote_text">«За первый месяц нашёл нишу увлажнителей — монополизация 0.82. Зашёл в пул с 11 продавцами, закупил по себестоимости. Теперь топ-3 в категории.»</p>
+          <div class="photo-author" data-i="quote_author">Айбек Сатпаев · Алматы, продавец Kaspi</div>
+        </div>
+      </div>
+      <div data-reveal>
+        <div class="section-tag" data-i="res_tag">Реальные результаты</div>
+        <h2 class="section-title" data-i="res_title">Что получают продавцы из Казахстана</h2>
+        <p class="section-sub" data-i="res_sub">RetailPool AI помогает МСБ конкурировать с крупными игроками через данные и коллективные закупки.</p>
+        <div class="results-list">
+          <div class="result-item">
+            <div class="result-item-icon">📈</div>
+            <div>
+              <h4 data-i="ri1_h">Средний рост дохода +67%</h4>
+              <p data-i="ri1_p">За первые 3 месяца участники увеличивают оборот на Kaspi.kz в среднем на 67%.</p>
+            </div>
+          </div>
+          <div class="result-item">
+            <div class="result-item-icon">💰</div>
+            <div>
+              <h4 data-i="ri2_h">Закупочная цена ниже рынка на 28–40%</h4>
+              <p data-i="ri2_p">Совместные пулы дают доступ к оптовым ценам крупных сетей.</p>
+            </div>
+          </div>
+          <div class="result-item">
+            <div class="result-item-icon">⚡</div>
+            <div>
+              <h4 data-i="ri3_h">Ниша найдена за 5 минут</h4>
+              <p data-i="ri3_p">Сканер выдаёт готовый список категорий с низкой конкуренцией и высоким спросом.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="section section-alt">
+  <div class="container">
+    <div class="section-tag" data-i="testi_tag">Отзывы</div>
+    <h2 class="section-title" data-i="testi_title">Продавцы говорят</h2>
+    <div class="testi-grid">
+      <div class="testi-card" data-reveal>
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text" data-i="t1_text">«Раньше угадывал ниши наугад. Теперь вижу индекс монополизации по каждой категории — захожу туда, где конкуренты слабые. За 2 месяца вышел в топ-5 по увлажнителям.»</p>
+        <div class="testi-author">
+          <div class="testi-avatar"><img src="https://images.unsplash.com/photo-1566753323558-f4e0952af115?w=80&q=80&auto=format&fit=crop&crop=face" alt="" /></div>
+          <div><div class="testi-name" data-i="t1_name">Нурсултан А.</div><div class="testi-role" data-i="t1_role">Продавец Kaspi.kz, Алматы</div></div>
+        </div>
+      </div>
+      <div class="testi-card" data-reveal>
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text" data-i="t2_text">«Присоединился к пулу на детские игрушки — закупил на 40% дешевле. Telegram-бот прислал счёт, оплатил через Kaspi Pay. Всё просто и прозрачно.»</p>
+        <div class="testi-author">
+          <div class="testi-avatar"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&q=80&auto=format&fit=crop&crop=face" alt="" /></div>
+          <div><div class="testi-name" data-i="t2_name">Дауит М.</div><div class="testi-role" data-i="t2_role">ИП продавец, Астана</div></div>
+        </div>
+      </div>
+      <div class="testi-card" data-reveal>
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text" data-i="t3_text">«Функция визуального аудита — это что-то. Вижу: у конкурента плохие фото, нет инфографики. Заказала дизайн через платформу, вышла в топ за неделю.»</p>
+        <div class="testi-author">
+          <div class="testi-avatar"><img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&q=80&auto=format&fit=crop&crop=face" alt="" /></div>
+          <div><div class="testi-name" data-i="t3_name">Айгерим К.</div><div class="testi-role" data-i="t3_role">Онлайн-магазин, Шымкент</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<div class="cta-wrap">
+  <div class="container">
+    <div class="cta-box">
+      <h2 data-i="cta_title">Найдите свою первую золотую нишу за 5 минут</h2>
+      <p data-i="cta_sub">Подключитесь к радару, получите первые инсайты в Telegram и присоединяйтесь к открытым пулам синдиката.</p>
+      <div class="cta-btns">
+        <a href="pricing.html" class="btn-white" data-i="cta_btn1">Выбрать тариф →</a>
+        <a href="scanner.html" class="btn-ghost-white" data-i="cta_btn2">Попробовать сканер</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div class="footer-brand">
+        <span class="nav-logo-icon" style="width:28px;height:28px;border-radius:8px;">
+          <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+            <circle cx="9" cy="9" r="6.5" stroke="white" stroke-width="1.5"/>
+            <circle cx="9" cy="9" r="3.5" stroke="white" stroke-width="1.5"/>
+            <circle cx="9" cy="9" r="1.5" fill="white"/>
+          </svg>
+        </span>
+        RetailPool AI
+      </div>
+      <p class="footer-desc" data-i="footer_desc"></p>
+    </div>
+    <div class="footer-col">
+      <h4 data-i="footer_product">Продукт</h4>
+      <a href="scanner.html" data-i="footer_l_scanner">Niche Scanner</a>
+      <a href="pools.html" data-i="footer_l_pools">Co-Buying пулы</a>
+      <a href="pricing.html" data-i="footer_l_pricing">Тарифы</a>
+      <a href="scanner.html#demo" data-i="footer_l_demo">Демо</a>
+    </div>
+    <div class="footer-col">
+      <h4 data-i="footer_company">Компания</h4>
+      <a href="#" data-i="footer_l_about">О проекте</a>
+      <a href="#" data-i="footer_l_contact">Контакты</a>
+      <a href="https://t.me/retailpoolai" target="_blank" data-i="footer_l_telegram">Telegram-бот</a>
+    </div>
+    <div class="footer-col">
+      <h4 data-i="footer_legal">Документы</h4>
+      <a href="#" data-i="footer_l_privacy">Конфиденциальность</a>
+      <a href="#" data-i="footer_l_terms">Условия использования</a>
+      <a href="#" data-i="footer_l_offer">Публичная оферта</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span data-i="footer_rights"></span>
+    <span data-i="footer_built"></span>
+  </div>
+</footer>
+
+<script src="assets/common.js"></script>
+<script>
+const PAGE_I18N = {
+  ru: {
+    hero_badge: "Live · Kaspi.kz · 24/7 сканирование",
+    hero_h1: 'Радар находит<br><span class="accent">слабые ниши</span><br>раньше вас',
+    hero_sub: "RetailPool AI непрерывно сканирует Kaspi.kz, вычисляет индекс монополизации каждой категории и находит товары, где конкуренты слабы — а спрос высок.",
+    hero_cta1: "Запустить сканер →", hero_cta2: "Как это работает",
+    stat1_label: "Категорий в радаре", stat2_label: "Уязвимых ниш сейчас", stat3_label: "Success Fee",
+    fc1_title: "Увлажнители воздуха", fc1_sub: "Монополизация 0.82 · Спрос ↑68%",
+    fc2_open: "Открыта", fc2_hot: "Горячая", fc2_n1: "Детские игрушки", fc2_n2: "Наушники TWS",
+    s1: "Категорий Kaspi.kz на радаре", s2: "Средний доп. доход участника", s3: "Активных продавцов в пулах", s4: "Success Fee — только с прибыли",
+    how_tag: "Процесс", how_title: "От сигнала до полки магазина",
+    how_sub: "Четыре шага — от обнаружения ниши до товара, готового к продаже на трёх маркетплейсах.",
+    step1_h: "Scouting Engine", step1_p: "ИИ парсит категории Kaspi.kz и считает индекс монополизации — соотношение спроса к числу активных продавцов.",
+    step2_h: "Визуальный аудит", step2_p: "Алгоритм проверяет фото, описания и отзывы конкурентов — слабые карточки помечаются как точка входа.",
+    step3_h: "Co-Buying пул", step3_p: "Платформа открывает пул, продавцы присоединяются, бот генерирует счета для оплаты через Kaspi Pay.",
+    step4_h: "Мультиканальный выход", step4_p: "Готовые карточки и инфографика для Kaspi, Wildberries и Ozon — выходите в топ с первого дня.",
+    pv1: "monop. index", pv2: "слабых карточки", pv3: "участников", pv4_val: "Kaspi+WB", pv4: "+Ozon",
+    feat_tag: "Возможности", feat_title: "Полный инструментарий разведки рынка",
+    feat_sub: "Каждый модуль решает конкретную задачу — от поиска ниши до выхода на полку маркетплейса.",
+    f1_p: "Анализ спроса и предложения по каждой категории — находим монополизируемые ниши с конкурентами-новичками.",
+    f2_h: "Визуальный аудит карточек", f2_p: "Оценка фото, отзывов и описаний конкурентов. Слабая карточка в топе — ваша точка входа.",
+    f3_h: "Синдикат закупок", f3_p: "Объединяйтесь с другими продавцами и закупайте по цене крупного опта без миллионных вложений.",
+    f4_h: "Офлайн + Онлайн аналитика", f4_p: "Остатки офлайн-магазинов и онлайн-сигналы Kaspi — в одном дашборде.",
+    f5_h: "Telegram-бот", f5_p: "Инсайты, алерты о новых нишах и документы для пулов — прямо в Telegram.",
+    f6_h: "Дизайн карточек «под ключ»", f6_p: "Автогенерация карточек товара для Kaspi, WB и Ozon с инфографикой — готовы к продаже сразу.",
+    res_tag: "Реальные результаты", res_title: "Что получают продавцы из Казахстана",
+    res_sub: "RetailPool AI помогает МСБ конкурировать с крупными игроками через данные и коллективные закупки.",
+    quote_text: "«За первый месяц нашёл нишу увлажнителей — монополизация 0.82. Зашёл в пул с 11 продавцами, закупил по себестоимости. Теперь топ-3 в категории.»",
+    quote_author: "Айбек Сатпаев · Алматы, продавец Kaspi",
+    ri1_h: "Средний рост дохода +67%", ri1_p: "За первые 3 месяца участники увеличивают оборот на Kaspi.kz в среднем на 67%.",
+    ri2_h: "Закупочная цена ниже рынка на 28–40%", ri2_p: "Совместные пулы дают доступ к оптовым ценам крупных сетей.",
+    ri3_h: "Ниша найдена за 5 минут", ri3_p: "Сканер выдаёт готовый список категорий с низкой конкуренцией и высоким спросом.",
+    testi_tag: "Отзывы", testi_title: "Продавцы говорят",
+    t1_text: "«Раньше угадывал ниши наугад. Теперь вижу индекс монополизации по каждой категории — захожу туда, где конкуренты слабые. За 2 месяца вышел в топ-5 по увлажнителям.»",
+    t1_name: "Нурсултан А.", t1_role: "Продавец Kaspi.kz, Алматы",
+    t2_text: "«Присоединился к пулу на детские игрушки — закупил на 40% дешевле. Telegram-бот прислал счёт, оплатил через Kaspi Pay. Всё просто и прозрачно.»",
+    t2_name: "Дауит М.", t2_role: "ИП продавец, Астана",
+    t3_text: "«Функция визуального аудита — это что-то. Вижу: у конкурента плохие фото, нет инфографики. Заказала дизайн через платформу, вышла в топ за неделю.»",
+    t3_name: "Айгерим К.", t3_role: "Онлайн-магазин, Шымкент",
+    cta_title: "Найдите свою первую золотую нишу за 5 минут",
+    cta_sub: "Подключитесь к радару, получите первые инсайты в Telegram и присоединяйтесь к открытым пулам синдиката.",
+    cta_btn1: "Выбрать тариф →", cta_btn2: "Попробовать сканер",
+    marquee: ["УВЛАЖНИТЕЛИ ВОЗДУХА","НАУШНИКИ TWS","ТОВАРЫ ДЛЯ ДАЧИ","ДЕТСКИЕ ИГРУШКИ","ВИТАМИНЫ И БАДЫ","ЧЕХЛЫ ДЛЯ ТЕЛЕФОНОВ","ОСВЕЖИТЕЛИ ВОЗДУХА","ПОВЕРБАНКИ","УМНЫЕ ЧАСЫ","КОРМА ДЛЯ ЖИВОТНЫХ"],
+  },
+  en: {
+    hero_badge: "Live · Kaspi.kz · 24/7 scanning",
+    hero_h1: 'The radar finds<br><span class="accent">weak niches</span><br>before you do',
+    hero_sub: "RetailPool AI continuously scans Kaspi.kz, computes a monopolization index for every category, and flags products where competitors are weak.",
+    hero_cta1: "Run the scanner →", hero_cta2: "How it works",
+    stat1_label: "Categories on radar", stat2_label: "Vulnerable niches now", stat3_label: "Success fee",
+    fc1_title: "Air humidifiers", fc1_sub: "Monopolization 0.82 · Demand ↑68%",
+    fc2_open: "Open", fc2_hot: "Hot", fc2_n1: "Kids toys", fc2_n2: "TWS earbuds",
+    s1: "Kaspi.kz categories on radar", s2: "Average extra income per seller", s3: "Active sellers in pools", s4: "Success Fee — on profit only",
+    how_tag: "Process", how_title: "From signal to shelf",
+    how_sub: "Four steps — from spotting a niche to a product ready to sell across three marketplaces.",
+    step1_h: "Scouting Engine", step1_p: "AI scans Kaspi.kz categories and computes a monopolization index — the ratio of demand to active sellers.",
+    step2_h: "Visual audit", step2_p: "The algorithm checks photos, descriptions and reviews of top competitors — weak listings are flagged as entry points.",
+    step3_h: "Co-Buying pool", step3_p: "The platform opens a pool, sellers join, and the bot generates invoices for payment via Kaspi Pay.",
+    step4_h: "Multichannel launch", step4_p: "Ready-made cards and infographics for Kaspi, Wildberries and Ozon — top the category from day one.",
+    pv1: "monop. index", pv2: "weak listings", pv3: "participants", pv4_val: "Kaspi+WB", pv4: "+Ozon",
+    feat_tag: "Features", feat_title: "A full scouting toolkit",
+    feat_sub: "Each module solves one specific job — from finding a niche to landing it on the shelf.",
+    f1_p: "Supply/demand ratio analysis per category — we find monopolizable niches where new sellers can win.",
+    f2_h: "Visual card audit", f2_p: "Evaluation of competitor photos, reviews and descriptions. A weak listing at the top is your entry point.",
+    f3_h: "Buying syndicate", f3_p: "Join other sellers and buy at large-wholesale prices — no million-tenge investment needed.",
+    f4_h: "Offline + Online analytics", f4_p: "Offline store inventory and online Kaspi signals — in one dashboard.",
+    f5_h: "Telegram bot", f5_p: "Insights, new niche alerts and pool documents — straight to Telegram.",
+    f6_h: "Turn-key card design", f6_p: "Auto-generated product cards for Kaspi, WB and Ozon with infographics — ready to sell immediately.",
+    res_tag: "Real results", res_title: "What sellers in Kazakhstan get",
+    res_sub: "RetailPool AI helps SMBs compete with large players through data and collective buying power.",
+    quote_text: "\"In the first month I found the humidifier niche — monopolization 0.82. Joined a pool with 11 sellers, bought at cost. Now top-3 in the category.\"",
+    quote_author: "Aibek Satpayev · Almaty, Kaspi seller",
+    ri1_h: "Average income growth +67%", ri1_p: "Sellers increase their Kaspi.kz turnover by an average of 67% in the first 3 months.",
+    ri2_h: "Purchase price 28–40% below market", ri2_p: "Co-buying pools give access to wholesale prices previously reserved for large chains.",
+    ri3_h: "Niche found in 5 minutes", ri3_p: "The scanner delivers a ready list of low-competition, high-demand categories — no manual analysis needed.",
+    testi_tag: "Reviews", testi_title: "Sellers are talking",
+    t1_text: "\"I used to guess niches blindly. Now I see the monopolization index for every category — I enter where competitors are weakest. Top-5 in humidifiers after 2 months.\"",
+    t1_name: "Nursultan A.", t1_role: "Kaspi.kz seller, Almaty",
+    t2_text: "\"Joined a pool for kids toys — bought 40% cheaper. The bot sent an invoice, I paid via Kaspi Pay. Simple and transparent.\"",
+    t2_name: "Dauit M.", t2_role: "Sole trader, Astana",
+    t3_text: "\"The visual audit feature is incredible. I can see the competitor has bad photos and no infographics. Ordered design through the platform and hit the top in a week.\"",
+    t3_name: "Aigerim K.", t3_role: "Online store, Shymkent",
+    cta_title: "Find your first golden niche in 5 minutes",
+    cta_sub: "Connect to the radar, get your first Telegram insights, and join open syndicate pools.",
+    cta_btn1: "Choose a plan →", cta_btn2: "Try the scanner",
+    marquee: ["AIR HUMIDIFIERS","TWS EARBUDS","GARDEN GOODS","KIDS TOYS","VITAMINS & SUPPLEMENTS","PHONE CASES","AIR FRESHENERS","POWER BANKS","SMARTWATCHES","PET FOOD"],
+  }
+};
+Object.keys(PAGE_I18N).forEach(l => Object.assign(RP_I18N[l], PAGE_I18N[l]));
+
+function renderMarquee() {
+  const items = RP_I18N[RP_LANG].marquee;
+  const html = items.map(m => `<span class="marquee-item"><span class="marquee-item-dot"></span>${m}</span>`).join('');
+  document.getElementById('marqueeTrack').innerHTML = html + html;
+}
+
+function onLangChange() { renderMarquee(); }
+renderMarquee();
+</script>
+</body>
+</html>
