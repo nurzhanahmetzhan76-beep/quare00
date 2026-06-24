@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kaspi Niche Scanner — RetailPool AI</title>
+<link rel="stylesheet" href="assets/style.css">
+<style>
+.page-hero { padding-top: 108px; padding-bottom: 3rem; }
+.page-hero-center { text-align: center; }
+.page-hero-center .section-tag { justify-content: center; }
+.page-hero-center .section-sub { margin: 0 auto; }
+
+/* ── Scanner panel ─────────────────────────────────────────── */
+.scanner-panel {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--radius-xl); overflow: hidden;
+  box-shadow: var(--shadow-lg); margin-top: 2rem;
+}
+.scanner-topbar {
+  background: var(--bg-2); border-bottom: 1px solid var(--border);
+  padding: 0.9rem 1.5rem;
+  display: flex; align-items: center; gap: 10px;
+}
+.topbar-dot { width: 10px; height: 10px; border-radius: 50%; }
+.topbar-title {
+  font-size: 13px; font-weight: 600; color: var(--text-3);
+  margin-left: 6px; flex: 1;
+}
+.topbar-live {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 600; color: var(--green);
+}
+.topbar-live-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--green);
+  animation: livepulse 2s ease-in-out infinite;
+}
+@keyframes livepulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+.scanner-input-row {
+  padding: 1.5rem; display: flex; gap: 10px; flex-wrap: wrap;
+  border-bottom: 1px solid var(--border);
+}
+.scan-input {
+  flex: 1; min-width: 220px;
+  background: var(--bg-2); border: 1.5px solid var(--border);
+  border-radius: var(--radius); padding: 13px 18px;
+  color: var(--text); font-size: 15px; outline: none;
+  font-family: var(--font-body);
+  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+}
+.scan-input:focus {
+  border-color: var(--brand); background: var(--bg);
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+}
+.scan-input::placeholder { color: var(--text-3); }
+.scan-btn { padding: 13px 28px; font-size: 15px; border-radius: var(--radius); }
+
+.chip-row { padding: 1rem 1.5rem 1.25rem; display: flex; gap: 8px; flex-wrap: wrap; }
+.chip {
+  font-size: 13px; font-weight: 500;
+  background: var(--bg-2); color: var(--text-2);
+  border: 1px solid var(--border); border-radius: 100px;
+  padding: 6px 14px; cursor: pointer; transition: all 0.15s;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.chip:hover { border-color: var(--brand); color: var(--brand); background: var(--brand-light); }
+
+/* ── Scan states ───────────────────────────────────────────── */
+.scan-body { padding: 2rem 1.5rem; min-height: 180px; }
+
+.scan-idle {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 14px; padding: 3rem 0;
+  color: var(--text-3);
+}
+.idle-ring {
+  width: 60px; height: 60px; border-radius: 50%;
+  border: 2px dashed var(--border-2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; animation: idlespin 16s linear infinite;
+}
+@keyframes idlespin { to { transform: rotate(360deg); } }
+.scan-idle p { font-size: 14px; font-weight: 500; }
+
+.scan-loading {
+  display: none; align-items: center; gap: 16px; padding: 3rem 0;
+}
+.scan-loading.active { display: flex; }
+.scan-spinner {
+  width: 24px; height: 24px; border-radius: 50%;
+  border: 2.5px solid var(--border-2); border-top-color: var(--brand);
+  animation: spin 0.65s linear infinite; flex-shrink: 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.scan-loading-text { font-size: 14px; color: var(--text-2); font-weight: 500; }
+.loading-dots::after {
+  content: ''; animation: dots 1.4s steps(4,end) infinite;
+}
+@keyframes dots {
+  0%{content:''} 25%{content:'.'} 50%{content:'..'} 75%{content:'...'} 100%{content:''}
+}
+
+/* ── Result ────────────────────────────────────────────────── */
+.scan-result { display: none; }
+.scan-result.active { display: block; animation: fadein 0.45s ease; }
+@keyframes fadein { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+.result-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem; border-bottom: 1px solid var(--border);
+}
+.result-title { font-family: var(--font-display); font-size: 1.4rem; font-weight: 700; }
+.result-score-wrap { display: flex; align-items: center; gap: 12px; }
+.score-circle {
+  width: 56px; height: 56px; border-radius: 50%;
+  border: 3px solid var(--brand); color: var(--brand);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-size: 15px; font-weight: 700;
+  box-shadow: 0 0 0 6px var(--brand-light); flex-shrink: 0;
+}
+.score-meta-label { font-size: 12px; color: var(--text-3); }
+.score-meta-val { font-size: 15px; font-weight: 700; color: var(--text); margin-top: 3px; }
+
+.metric-grid {
+  display: grid; grid-template-columns: repeat(4,1fr);
+  gap: 1px; background: var(--border);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  overflow: hidden; margin-bottom: 1.75rem;
+}
+.metric-cell { background: var(--bg-2); padding: 14px 16px; }
+.metric-label {
+  font-size: 11px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--text-3); margin-bottom: 6px;
+}
+.metric-val { font-family: var(--font-display); font-size: 1rem; font-weight: 700; }
+
+.result-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+.col-label {
+  font-size: 12px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--text-3); margin-bottom: 0.75rem;
+}
+.insight-list { display: flex; flex-direction: column; gap: 8px; }
+.insight-row {
+  display: flex; gap: 10px; align-items: flex-start; font-size: 13.5px;
+  color: var(--text-2); line-height: 1.5;
+  background: var(--bg-2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 10px 14px;
+}
+.insight-row.weak { border-color: rgba(239,68,68,0.3); background: var(--red-bg); }
+.insight-row.reco { border-color: rgba(37,99,235,0.3); background: var(--brand-light); }
+.insight-mark { font-weight: 700; flex-shrink: 0; }
+.insight-row.weak .insight-mark { color: var(--red); }
+.insight-row.reco .insight-mark { color: var(--brand); }
+
+.analysis-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3); margin-bottom: 0.6rem; }
+.analysis-text {
+  font-size: 14px; color: var(--text-2); line-height: 1.8;
+  background: var(--bg-2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 1.25rem 1.5rem; margin-bottom: 1.5rem;
+}
+.cursor-blink {
+  display: inline-block; width: 2px; height: 14px;
+  background: var(--brand); margin-left: 1px;
+  animation: blink 0.8s step-end infinite; vertical-align: middle;
+}
+@keyframes blink { 50%{opacity:0} }
+
+.pool-cta-banner {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; flex-wrap: wrap;
+  background: var(--brand-light); border: 1.5px solid var(--brand-mid);
+  border-radius: var(--radius); padding: 1.1rem 1.5rem;
+}
+.pool-cta-text { font-size: 14px; color: var(--text); }
+.pool-cta-text strong { color: var(--brand); }
+
+/* ── How it works mini ─────────────────────────────────────── */
+.mini-steps {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem;
+  margin-top: 3rem;
+}
+.mini-step {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 1.5rem;
+  text-align: center;
+}
+.mini-step-num {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: var(--brand-light); color: var(--brand);
+  font-family: var(--font-display); font-size: 14px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;
+}
+.mini-step h3 { font-size: 15px; font-weight: 700; margin-bottom: 0.5rem; }
+.mini-step p { font-size: 13px; color: var(--text-2); line-height: 1.65; }
+
+@media (max-width: 700px) {
+  .result-cols { grid-template-columns: 1fr; }
+  .metric-grid { grid-template-columns: repeat(2,1fr); }
+  .mini-steps { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">RetailPool AI</a>
+    <div class="nav-links" id="navLinks">
+      <a href="index.html" data-i="nav_home">Главная</a>
+      <a href="scanner.html" class="active" data-i="nav_scanner">Сканер</a>
+      <a href="pools.html" data-i="nav_pools">Пулы</a>
+      <a href="pricing.html" data-i="nav_pricing">Тарифы</a>
+    </div>
+    <div class="nav-right">
+      <div class="lang-switch">
+        <button class="lang-btn active" data-lang="ru" onclick="rpSetLang('ru')">RU</button>
+        <button class="lang-btn" data-lang="en" onclick="rpSetLang('en')">EN</button>
+      </div>
+      <a href="auth.html?view=login" class="btn-secondary" style="padding:9px 18px;font-size:14px;">Войти</a>
+      <a href="auth.html?view=register" class="btn-primary" style="padding:9px 18px;font-size:14px;">Регистрация</a>
+      <button class="nav-burger" onclick="rpToggleMobileNav()">☰</button>
+    </div>
+  </div>
+</nav>
+
+<main>
+  <section class="page-hero" id="demo">
+    <div class="container-narrow page-hero-center">
+      <div class="section-tag" data-i="ph_tag">Kaspi Niche Scanner</div>
+      <h1 data-i="ph_title">Введите товар — получите разведданные</h1>
+      <p class="section-sub" data-i="ph_sub">Живой анализ ниши на Kaspi.kz: спрос, слабые конкуренты и рекомендации по входу за секунды.</p>
+    </div>
+  </section>
+
+  <section style="padding-top:0; padding-bottom:5rem;">
+    <div class="container">
+      <div class="scanner-panel" data-reveal>
+        <div class="scanner-topbar">
+          <span class="topbar-dot" style="background:#f87171;"></span>
+          <span class="topbar-dot" style="background:#fbbf24;"></span>
+          <span class="topbar-dot" style="background:#34d399;"></span>
+          <span class="topbar-title">retailpool — kaspi.kz scanner</span>
+          <span class="topbar-live"><span class="topbar-live-dot"></span><span data-i="term_live">ОНЛАЙН</span></span>
+        </div>
+
+        <div class="scanner-input-row">
+          <input class="scan-input" id="nicheInput"
+            data-i_ph="scan_ph"
+            placeholder="увлажнитель воздуха, наушники TWS..."
+            onkeydown="if(event.key==='Enter')runAnalysis()">
+          <button class="btn-primary scan-btn" id="analyzeBtn" onclick="runAnalysis()">
+            <span data-i="scan_btn">Сканировать</span>
+          </button>
+        </div>
+
+        <div class="chip-row">
+          <span class="chip" onclick="fillChip(this)" data-ru="увлажнитель воздуха" data-en="air humidifier">💧 <span data-i="chip1">Увлажнитель воздуха</span></span>
+          <span class="chip" onclick="fillChip(this)" data-ru="беспроводные наушники" data-en="wireless earbuds">🎧 <span data-i="chip2">Беспроводные наушники</span></span>
+          <span class="chip" onclick="fillChip(this)" data-ru="детские игрушки монтессори" data-en="montessori toys">🧸 <span data-i="chip3">Игрушки Монтессори</span></span>
+          <span class="chip" onclick="fillChip(this)" data-ru="витамины и бады" data-en="vitamins supplements">💊 <span data-i="chip4">Витамины и БАДы</span></span>
+          <span class="chip" onclick="fillChip(this)" data-ru="товары для дачи" data-en="garden goods">🌿 <span data-i="chip5">Товары для дачи</span></span>
+        </div>
+
+        <div class="scan-body">
+          <div class="scan-idle" id="scanIdle">
+            <div class="idle-ring">◎</div>
+            <p data-i="scan_idle">Введите товар выше и нажмите «Сканировать»</p>
+          </div>
+          <div class="scan-loading" id="scanLoading">
+            <div class="scan-spinner"></div>
+            <span class="scan-loading-text" id="loadingText"><span data-i="scan_loading">Сканирую Kaspi.kz</span><span class="loading-dots"></span></span>
+          </div>
+          <div class="scan-result" id="scanResult">
+            <div class="result-header">
+              <div class="result-title" id="resultTitle"></div>
+              <div class="result-score-wrap">
+                <div class="score-circle" id="scoreCircle"></div>
+                <div>
+                  <div class="score-meta-label" data-i="score_label">Niche Score</div>
+                  <div class="score-meta-val" id="scoreLabel"></div>
+                </div>
+              </div>
+            </div>
+            <div class="metric-grid" id="metricGrid"></div>
+            <div class="result-cols">
+              <div>
+                <div class="col-label" data-i="res_weak">Слабые места конкурентов</div>
+                <div class="insight-list" id="weaknessList"></div>
+              </div>
+              <div>
+                <div class="col-label" data-i="res_reco">Рекомендации RetailPool AI</div>
+                <div class="insight-list" id="recoList"></div>
+              </div>
+            </div>
+            <div class="analysis-label" data-i="res_analysis">Полный анализ</div>
+            <div class="analysis-text" id="analysisBlock"></div>
+            <div class="pool-cta-banner">
+              <div class="pool-cta-text">
+                <strong data-i="pool_ready">Пул открыт.</strong>
+                <span data-i="pool_desc"> 7 продавцов готовы войти в совместную закупку по этой нише.</span>
+              </div>
+              <a href="pools.html" class="btn-primary" style="font-size:13px;padding:10px 20px;" data-i="pool_join">Войти в пул →</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- mini steps -->
+      <div style="margin-top:4rem;">
+        <div class="section-tag" data-i="mini_tag">Как читать результат</div>
+        <h2 class="section-title" data-i="mini_title">Три числа, которые решают всё</h2>
+        <div class="mini-steps">
+          <div class="mini-step" data-reveal>
+            <div class="mini-step-num">01</div>
+            <h3 data-i="ms1_h">Niche Score</h3>
+            <p data-i="ms1_p">Интегральная оценка от 1 до 100. Выше 70 — ниша открыта, ниже 40 — рынок насыщен.</p>
+          </div>
+          <div class="mini-step" data-reveal>
+            <div class="mini-step-num">02</div>
+            <h3 data-i="ms2_h">Индекс монополизации</h3>
+            <p data-i="ms2_p">Ближе к 1.0 — рынок занят одним игроком. Ближе к 0.0 — рынок распределён равномерно.</p>
+          </div>
+          <div class="mini-step" data-reveal>
+            <div class="mini-step-num">03</div>
+            <h3 data-i="ms3_h">Слабые карточки</h3>
+            <p data-i="ms3_p">Если у топа плохие фото и нет инфографики — это ваша точка входа с нулевой экспертизой.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div class="footer-brand">
+        <span class="nav-logo-icon" style="width:28px;height:28px;border-radius:8px;">
+          <svg width="16" height="16" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="6.5" stroke="white" stroke-width="1.5"/><circle cx="9" cy="9" r="3.5" stroke="white" stroke-width="1.5"/><circle cx="9" cy="9" r="1.5" fill="white"/></svg>
+        </span>
+        RetailPool AI
+      </div>
+      <p class="footer-desc" data-i="footer_desc"></p>
+    </div>
+    <div class="footer-col"><h4 data-i="footer_product"></h4><a href="scanner.html" data-i="footer_l_scanner"></a><a href="pools.html" data-i="footer_l_pools"></a><a href="pricing.html" data-i="footer_l_pricing"></a><a href="scanner.html#demo" data-i="footer_l_demo"></a></div>
+    <div class="footer-col"><h4 data-i="footer_company"></h4><a href="#" data-i="footer_l_about"></a><a href="#" data-i="footer_l_contact"></a><a href="https://t.me/retailpoolai" target="_blank" data-i="footer_l_telegram"></a></div>
+    <div class="footer-col"><h4 data-i="footer_legal"></h4><a href="#" data-i="footer_l_privacy"></a><a href="#" data-i="footer_l_terms"></a><a href="#" data-i="footer_l_offer"></a></div>
+  </div>
+  <div class="footer-bottom"><span data-i="footer_rights"></span><span data-i="footer_built"></span></div>
+</footer>
+
+<script src="assets/common.js"></script>
+<script>
+const PAGE_I18N = {
+  ru: {
+    ph_tag:"Kaspi Niche Scanner", ph_title:"Введите товар — получите разведданные",
+    ph_sub:"Живой анализ ниши на Kaspi.kz: спрос, слабые конкуренты и рекомендации по входу за секунды.",
+    term_live:"ОНЛАЙН", scan_ph:"увлажнитель воздуха, наушники TWS, товары для дачи...",
+    scan_btn:"Сканировать →", scan_idle:"Введите товар выше и нажмите «Сканировать»",
+    scan_loading:"Сканирую Kaspi.kz", score_label:"Niche Score",
+    chip1:"Увлажнитель воздуха", chip2:"Беспроводные наушники", chip3:"Игрушки Монтессори", chip4:"Витамины и БАДы", chip5:"Товары для дачи",
+    res_weak:"Слабые места конкурентов", res_reco:"Рекомендации RetailPool AI", res_analysis:"Полный анализ",
+    pool_ready:"Пул открыт.", pool_desc:" 7 продавцов готовы войти в совместную закупку по этой нише.", pool_join:"Войти в пул →",
+    metric_demand:"Спрос", metric_sellers:"Продавцов", metric_price:"Средняя цена", metric_opp:"Потенциал",
+    scan_error:"Ошибка анализа. Попробуйте снова.",
+    loading_msgs:["Сканирую Kaspi.kz","Анализирую конкурентов","Оцениваю карточки","Генерирую инсайты"],
+    mini_tag:"Как читать результат", mini_title:"Три числа, которые решают всё",
+    ms1_h:"Niche Score", ms1_p:"Интегральная оценка от 1 до 100. Выше 70 — ниша открыта, ниже 40 — рынок насыщен.",
+    ms2_h:"Индекс монополизации", ms2_p:"Ближе к 1.0 — рынок занят одним игроком. Ближе к 0.0 — рынок распределён равномерно.",
+    ms3_h:"Слабые карточки", ms3_p:"Если у топа плохие фото и нет инфографики — это ваша точка входа с нулевой экспертизой.",
+  },
+  en: {
+    ph_tag:"Kaspi Niche Scanner", ph_title:"Enter a product — get intel",
+    ph_sub:"Live niche analysis on Kaspi.kz: demand, weak competitors and entry recommendations in seconds.",
+    term_live:"LIVE", scan_ph:"air humidifier, TWS earbuds, garden goods...",
+    scan_btn:"Scan →", scan_idle:"Enter a product above and click Scan",
+    scan_loading:"Scanning Kaspi.kz", score_label:"Niche Score",
+    chip1:"Air humidifier", chip2:"Wireless earbuds", chip3:"Montessori toys", chip4:"Vitamins & supplements", chip5:"Garden goods",
+    res_weak:"Competitor weaknesses", res_reco:"RetailPool AI recommendations", res_analysis:"Full analysis",
+    pool_ready:"Pool open.", pool_desc:" 7 sellers are ready to join the co-buying pool for this niche.", pool_join:"Join pool →",
+    metric_demand:"Demand", metric_sellers:"Sellers", metric_price:"Avg price", metric_opp:"Opportunity",
+    scan_error:"Analysis failed. Please try again.",
+    loading_msgs:["Scanning Kaspi.kz","Analyzing competitors","Auditing product cards","Generating insights"],
+    mini_tag:"How to read the result", mini_title:"Three numbers that decide everything",
+    ms1_h:"Niche Score", ms1_p:"A composite score from 1 to 100. Above 70 — niche is open; below 40 — market is saturated.",
+    ms2_h:"Monopolization index", ms2_p:"Close to 1.0 — one player dominates. Close to 0.0 — market is evenly spread.",
+    ms3_h:"Weak listings", ms3_p:"If the top listings have bad photos and no infographics — that's your zero-expertise entry point.",
+  }
+};
+Object.keys(PAGE_I18N).forEach(l => Object.assign(RP_I18N[l], PAGE_I18N[l]));
+
+function fillChip(el) {
+  document.getElementById('nicheInput').value = RP_LANG==='ru' ? el.getAttribute('data-ru') : el.getAttribute('data-en');
+  runAnalysis();
+}
+
+async function runAnalysis() {
+  const niche = document.getElementById('nicheInput').value.trim();
+  if (!niche) return;
+  const t = RP_I18N[RP_LANG];
+  document.getElementById('scanIdle').style.display = 'none';
+  document.getElementById('scanResult').classList.remove('active');
+  const loading = document.getElementById('scanLoading');
+  loading.classList.add('active');
+  document.getElementById('analyzeBtn').disabled = true;
+  let mi = 0;
+  const lt = document.querySelector('#loadingText [data-i]');
+  const msgInterval = setInterval(() => {
+    mi = (mi+1) % t.loading_msgs.length;
+    if(lt) lt.textContent = t.loading_msgs[mi];
+  }, 1400);
+  const isRu = RP_LANG==='ru';
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-6', max_tokens:1000,
+        system: isRu
+          ? 'Ты — RetailPool AI, система анализа ниш на Kaspi.kz. Отвечай ТОЛЬКО на русском языке строго в JSON без markdown.'
+          : 'You are RetailPool AI, a niche analysis system for Kaspi.kz. Reply ONLY in JSON, no markdown.',
+        messages:[{role:'user', content: isRu
+          ? `Проанализируй нишу "${niche}" на Kaspi.kz. Верни JSON: {"score":число1-100,"scoreLabel":"строка","demand":"строка","sellers":"строка","avgPrice":"строка","opportunity":"строка","weaknesses":["строка","строка","строка"],"recommendations":["строка","строка","строка"],"analysis":"3-4 предложения"}`
+          : `Analyze niche "${niche}" on Kaspi.kz. Return JSON: {"score":number1-100,"scoreLabel":"string","demand":"string","sellers":"string","avgPrice":"string","opportunity":"string","weaknesses":["str","str","str"],"recommendations":["str","str","str"],"analysis":"3-4 sentences"}`
+        }]
+      })
+    });
+    const data = await resp.json();
+    const raw = data.content.map(b=>b.text||'').join('').trim().replace(/```json|```/g,'');
+    const r = JSON.parse(raw);
+    clearInterval(msgInterval);
+    loading.classList.remove('active');
+    document.getElementById('analyzeBtn').disabled = false;
+    document.getElementById('resultTitle').textContent = niche;
+    document.getElementById('scoreCircle').textContent = r.score;
+    document.getElementById('scoreLabel').textContent = r.scoreLabel;
+    const scoreColor = r.score >= 70 ? 'var(--green)' : r.score >= 45 ? 'var(--amber)' : 'var(--red)';
+    document.getElementById('scoreCircle').style.borderColor = scoreColor;
+    document.getElementById('scoreCircle').style.color = scoreColor;
+    document.getElementById('scoreCircle').style.boxShadow = `0 0 0 6px ${r.score>=70?'var(--green-bg)':r.score>=45?'var(--amber-bg)':'var(--red-bg)'}`;
+    document.getElementById('metricGrid').innerHTML = [
+      {l:t.metric_demand, v:r.demand, c:'var(--brand)'},
+      {l:t.metric_sellers, v:r.sellers, c:'var(--amber)'},
+      {l:t.metric_price, v:r.avgPrice, c:'var(--text)'},
+      {l:t.metric_opp, v:r.opportunity, c:'var(--green)'},
+    ].map(m=>`<div class="metric-cell"><div class="metric-label">${m.l}</div><div class="metric-val" style="color:${m.c}">${m.v}</div></div>`).join('');
+    document.getElementById('weaknessList').innerHTML = r.weaknesses.map(w=>`<div class="insight-row weak"><span class="insight-mark">✗</span><span>${w}</span></div>`).join('');
+    document.getElementById('recoList').innerHTML = r.recommendations.map(rc=>`<div class="insight-row reco"><span class="insight-mark">✓</span><span>${rc}</span></div>`).join('');
+    const block = document.getElementById('analysisBlock');
+    block.textContent = '';
+    document.getElementById('scanResult').classList.add('active');
+    let i=0; const chars=r.analysis.split('');
+    const cursor=document.createElement('span'); cursor.className='cursor-blink'; block.appendChild(cursor);
+    const typer=setInterval(()=>{ if(i<chars.length){block.insertBefore(document.createTextNode(chars[i]),cursor);i++;}else{cursor.remove();clearInterval(typer);} },14);
+  } catch(e) {
+    clearInterval(msgInterval);
+    loading.classList.remove('active');
+    document.getElementById('analyzeBtn').disabled = false;
+    document.getElementById('scanIdle').style.display = 'flex';
+    document.getElementById('scanIdle').querySelector('p').textContent = t.scan_error;
+  }
+}
+</script>
+</body>
+</html>

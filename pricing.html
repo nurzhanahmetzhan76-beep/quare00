@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Тарифы — RetailPool AI</title>
+<link rel="stylesheet" href="assets/style.css">
+<style>
+.page-hero { padding-top: 108px; padding-bottom: 3rem; text-align: center; }
+.page-hero .section-tag { justify-content: center; }
+.page-hero h1 { max-width: 640px; margin: 0 auto 1rem; }
+.page-hero p { max-width: 520px; margin: 0 auto; }
+
+/* ── Plans grid ────────────────────────────────────────────── */
+.plans-section { padding: 1rem 0 5rem; }
+.plans-grid {
+  display: grid; grid-template-columns: repeat(3,1fr);
+  gap: 1.5rem; margin-top: 3rem;
+}
+.plan-card {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--radius-xl); padding: 2rem;
+  display: flex; flex-direction: column; position: relative;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.plan-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+.plan-card.featured {
+  border: 2px solid var(--brand);
+  background: linear-gradient(170deg, var(--brand-light) 0%, var(--bg) 55%);
+}
+.plan-popular {
+  position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+  background: var(--brand); color: #fff;
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+  padding: 5px 18px; border-radius: 100px; white-space: nowrap;
+}
+.plan-tier { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3); margin-bottom: 0.6rem; }
+.plan-price { font-family: var(--font-display); font-size: 2.8rem; font-weight: 700; color: var(--text); line-height: 1; letter-spacing: -0.03em; }
+.plan-price sup { font-size: 1.2rem; font-weight: 600; vertical-align: top; margin-top: 0.4rem; display: inline-block; }
+.plan-period { font-size: 13px; color: var(--text-3); margin: 6px 0 1rem; }
+.plan-desc { font-size: 14px; color: var(--text-2); line-height: 1.65; padding-bottom: 1.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+.plan-features { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 1.75rem; flex: 1; }
+.plan-features li { font-size: 14px; color: var(--text-2); display: flex; align-items: flex-start; gap: 10px; line-height: 1.5; }
+.feat-check { color: var(--green); font-size: 15px; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+.feat-cross { color: var(--border-2); font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+
+/* ── Compare table ─────────────────────────────────────────── */
+.compare-section { padding: 5rem 0; background: var(--bg-2); }
+.compare-table { width: 100%; border-collapse: collapse; margin-top: 2.5rem; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--border); }
+.compare-table th {
+  padding: 1rem 1.25rem; text-align: center; font-size: 13px; font-weight: 700;
+  background: var(--bg-3); border-bottom: 1px solid var(--border);
+}
+.compare-table th:first-child { text-align: left; }
+.compare-table th.featured-col { background: var(--brand-light); color: var(--brand); }
+.compare-table td { padding: 0.9rem 1.25rem; border-bottom: 1px solid var(--border); font-size: 14px; text-align: center; color: var(--text-2); background: var(--bg); }
+.compare-table td:first-child { text-align: left; font-weight: 500; color: var(--text); }
+.compare-table td.featured-col { background: #FAFCFF; }
+.compare-table tr:last-child td { border-bottom: none; }
+.compare-table tr:hover td { background: var(--bg-2); }
+.compare-table tr:hover td.featured-col { background: var(--brand-light); opacity: 0.8; }
+.c-yes { color: var(--green); font-size: 18px; }
+.c-no  { color: var(--border-2); font-size: 18px; }
+.c-text { font-size: 13px; font-weight: 600; color: var(--brand); }
+
+/* ── FAQ ───────────────────────────────────────────────────── */
+.faq-section { padding: 5rem 0; }
+.faq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 2.5rem; }
+.faq-item {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden; cursor: pointer;
+  transition: border-color 0.15s;
+}
+.faq-item:hover { border-color: var(--border-2); }
+.faq-item.open { border-color: var(--brand); }
+.faq-q {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 1.2rem 1.5rem; font-size: 15px; font-weight: 600; gap: 1rem; user-select: none;
+}
+.faq-icon { color: var(--brand); font-size: 22px; font-weight: 300; flex-shrink: 0; transition: transform 0.2s; line-height: 1; }
+.faq-item.open .faq-icon { transform: rotate(45deg); }
+.faq-a { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+.faq-item.open .faq-a { max-height: 200px; }
+.faq-a p { padding: 0 1.5rem 1.25rem; font-size: 14px; color: var(--text-2); line-height: 1.7; }
+
+@media (max-width: 860px) {
+  .plans-grid { grid-template-columns: 1fr; max-width: 440px; margin-left: auto; margin-right: auto; }
+  .compare-section { display: none; }
+  .faq-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">RetailPool AI</a>
+    <div class="nav-links" id="navLinks">
+      <a href="index.html" data-i="nav_home">Главная</a>
+      <a href="scanner.html" data-i="nav_scanner">Сканер</a>
+      <a href="pools.html" data-i="nav_pools">Пулы</a>
+      <a href="pricing.html" class="active" data-i="nav_pricing">Тарифы</a>
+    </div>
+    <div class="nav-right">
+      <div class="lang-switch">
+        <button class="lang-btn active" data-lang="ru" onclick="rpSetLang('ru')">RU</button>
+        <button class="lang-btn" data-lang="en" onclick="rpSetLang('en')">EN</button>
+      </div>
+      <a href="auth.html?view=login" class="btn-secondary" style="padding:9px 18px;font-size:14px;">Войти</a>
+      <a href="auth.html?view=register" class="btn-primary" style="padding:9px 18px;font-size:14px;">Регистрация</a>
+      <button class="nav-burger" onclick="rpToggleMobileNav()">☰</button>
+    </div>
+  </div>
+</nav>
+
+<main>
+  <section class="page-hero">
+    <div class="container">
+      <div class="section-tag" data-i="ph_tag">Тарифы</div>
+      <h1 data-i="ph_title">Выберите план для вашего масштаба</h1>
+      <p style="color:var(--text-2);font-size:1.05rem;line-height:1.7;" data-i="ph_sub">Начните с разведки одной ниши или подключите весь синдикат — цена растёт вместе с вашим бизнесом.</p>
+    </div>
+  </section>
+
+  <section class="plans-section">
+    <div class="container">
+      <div class="plans-grid" id="plansGrid"></div>
+      <p style="text-align:center;font-size:13px;color:var(--text-3);margin-top:1.5rem;" data-i="fee_note">+ Success Fee 3–5% только при успешном завершении пула · Без комиссий при несостоявшейся закупке</p>
+    </div>
+  </section>
+
+  <!-- COMPARE -->
+  <section class="compare-section">
+    <div class="container">
+      <div class="section-tag" data-i="cmp_tag">Сравнение</div>
+      <h2 class="section-title" data-i="cmp_title">Что входит в каждый план</h2>
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th data-i="cmp_feature" style="width:40%">Функция</th>
+            <th data-i="cmp_start">Старт</th>
+            <th class="featured-col" data-i="cmp_biz">Бизнес</th>
+            <th data-i="cmp_agency">Агентство</th>
+          </tr>
+        </thead>
+        <tbody id="compareBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq-section">
+    <div class="container">
+      <div class="section-tag" data-i="faq_tag">FAQ</div>
+      <h2 class="section-title" data-i="faq_title">Частые вопросы</h2>
+      <div class="faq-grid" id="faqGrid"></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="footer-grid">
+    <div><div class="footer-brand"><span class="nav-logo-icon" style="width:28px;height:28px;border-radius:8px;"><svg width="16" height="16" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="6.5" stroke="white" stroke-width="1.5"/><circle cx="9" cy="9" r="3.5" stroke="white" stroke-width="1.5"/><circle cx="9" cy="9" r="1.5" fill="white"/></svg></span>RetailPool AI</div><p class="footer-desc" data-i="footer_desc"></p></div>
+    <div class="footer-col"><h4 data-i="footer_product"></h4><a href="scanner.html" data-i="footer_l_scanner"></a><a href="pools.html" data-i="footer_l_pools"></a><a href="pricing.html" data-i="footer_l_pricing"></a><a href="scanner.html#demo" data-i="footer_l_demo"></a></div>
+    <div class="footer-col"><h4 data-i="footer_company"></h4><a href="#" data-i="footer_l_about"></a><a href="#" data-i="footer_l_contact"></a><a href="https://t.me/retailpoolai" target="_blank" data-i="footer_l_telegram"></a></div>
+    <div class="footer-col"><h4 data-i="footer_legal"></h4><a href="#" data-i="footer_l_privacy"></a><a href="#" data-i="footer_l_terms"></a><a href="#" data-i="footer_l_offer"></a></div>
+  </div>
+  <div class="footer-bottom"><span data-i="footer_rights"></span><span data-i="footer_built"></span></div>
+</footer>
+
+<script src="assets/common.js"></script>
+<script>
+const PAGE_I18N = {
+  ru:{
+    ph_tag:"Тарифы", ph_title:"Выберите план для вашего масштаба",
+    ph_sub:"Начните с разведки одной ниши или подключите весь синдикат — цена растёт вместе с вашим бизнесом.",
+    fee_note:"+ Success Fee 3–5% только при успешном завершении пула · Без комиссий при несостоявшейся закупке",
+    cmp_tag:"Сравнение", cmp_title:"Что входит в каждый план",
+    cmp_feature:"Функция", cmp_start:"Старт", cmp_biz:"Бизнес", cmp_agency:"Агентство",
+    faq_tag:"FAQ", faq_title:"Частые вопросы",
+    plans:[
+      { tier:"Старт", price:"9 900", period:"₸ / месяц", desc:"Для начинающих продавцов, которые хотят найти первую прибыльную нишу на Kaspi.kz.", features:["5 Niche Scanner отчётов в месяц","Smart Alerts в Telegram","Участие в 1 закупочном пуле","Базовая аналитика категорий"], url:"checkout.html?plan=Старт&price=9900", featured:false, popular:false },
+      { tier:"Бизнес", price:"29 900", period:"₸ / месяц", desc:"Для активных продавцов, которые работают сразу на нескольких площадках.", features:["Неограниченные Niche Scanner отчёты","Приоритетные Smart Alerts","Участие в неограниченных пулах","Мультиканальный выход (Kaspi + WB + Ozon)","Автогенерация карточек товара","Аналитика офлайн-остатков"], url:"checkout.html?plan=Бизнес&price=29900", featured:true, popular:true },
+      { tier:"Агентство", price:"79 900", period:"₸ / месяц", desc:"Для агентств и крупных продавцов, управляющих несколькими магазинами.", features:["Всё из тарифа Бизнес","До 10 магазинов под одним аккаунтом","API-доступ","Выделенный персональный менеджер","Whitelabel отчёты"], url:"checkout.html?plan=Агентство&price=79900", featured:false, popular:false },
+    ],
+    compare:[
+      ["Niche Scanner отчёты","5 / мес","Безлимит","Безлимит"],
+      ["Smart Alerts в Telegram","✓","✓","✓"],
+      ["Co-Buying пулы","1 пул","Безлимит","Безлимит"],
+      ["Kaspi + WB + Ozon","—","✓","✓"],
+      ["Автогенерация карточек","—","✓","✓"],
+      ["Офлайн аналитика","—","✓","✓"],
+      ["Несколько магазинов","—","—","До 10"],
+      ["API-доступ","—","—","✓"],
+      ["Персональный менеджер","—","—","✓"],
+    ],
+    faqs:[
+      {q:"Как быстро я увижу первые инсайты?", a:"После регистрации Scouting Engine начинает сканирование немедленно. Первые алерты в Telegram приходят уже в течение нескольких часов."},
+      {q:"Сколько человек нужно для открытия пула?", a:"Минимум 3 участника. Как только набирается нужное количество, бот автоматически генерирует счета и организует единый заказ."},
+      {q:"Работает ли платформа только с Kaspi?", a:"Niche Scanner сфокусирован на Kaspi.kz. Карточки товаров генерируются для Kaspi, Wildberries и Ozon."},
+      {q:"Можно ли отменить подписку?", a:"Да, в любой момент без штрафов. Доступ сохраняется до конца оплаченного периода."},
+      {q:"Как работает Success Fee?", a:"3–5% взимается только при успешном завершении совместной закупки. Если пул не собрался — комиссия не берётся."},
+      {q:"Есть ли пробный период?", a:"Да, первые 7 дней бесплатно на тарифе Старт. Карта не требуется при регистрации."},
+    ],
+    popular_label:"Популярный",
+    btn_choose:"Выбрать план →", btn_choose_featured:"Начать сейчас →",
+  },
+  en:{
+    ph_tag:"Pricing", ph_title:"Choose a plan for your scale",
+    ph_sub:"Start by scouting a single niche or connect the full syndicate — price scales with your business.",
+    fee_note:"+ Success Fee 3–5% on successful pool close only · No fee if the purchase doesn't go through",
+    cmp_tag:"Compare", cmp_title:"What's included in each plan",
+    cmp_feature:"Feature", cmp_start:"Starter", cmp_biz:"Business", cmp_agency:"Agency",
+    faq_tag:"FAQ", faq_title:"Frequently asked questions",
+    plans:[
+      { tier:"Starter", price:"9 900", period:"₸ / month", desc:"For beginner sellers who want to find their first profitable niche on Kaspi.kz.", features:["5 Niche Scanner reports per month","Smart Alerts in Telegram","Participation in 1 co-buying pool","Basic category analytics"], url:"checkout.html?plan=Starter&price=9900", featured:false, popular:false },
+      { tier:"Business", price:"29 900", period:"₸ / month", desc:"For active sellers operating across multiple marketplaces.", features:["Unlimited Niche Scanner reports","Priority Smart Alerts","Unlimited co-buying pools","Multi-channel launch (Kaspi + WB + Ozon)","Auto-generated product cards","Offline inventory analytics"], url:"checkout.html?plan=Business&price=29900", featured:true, popular:true },
+      { tier:"Agency", price:"79 900", period:"₸ / month", desc:"For agencies and large sellers managing multiple stores.", features:["Everything in Business","Up to 10 stores under one account","API access","Dedicated account manager","Whitelabel reports"], url:"checkout.html?plan=Agency&price=79900", featured:false, popular:false },
+    ],
+    compare:[
+      ["Niche Scanner reports","5 / mo","Unlimited","Unlimited"],
+      ["Smart Alerts in Telegram","✓","✓","✓"],
+      ["Co-buying pools","1 pool","Unlimited","Unlimited"],
+      ["Kaspi + WB + Ozon","—","✓","✓"],
+      ["Auto-generated cards","—","✓","✓"],
+      ["Offline analytics","—","✓","✓"],
+      ["Multiple stores","—","—","Up to 10"],
+      ["API access","—","—","✓"],
+      ["Account manager","—","—","✓"],
+    ],
+    faqs:[
+      {q:"How quickly will I see the first insights?", a:"After registration, the Scouting Engine starts scanning immediately. First Telegram alerts arrive within a few hours."},
+      {q:"How many people are needed to open a pool?", a:"Minimum 3 participants. Once the required number is reached, the bot automatically generates invoices and organises the order."},
+      {q:"Does the platform only work with Kaspi?", a:"The Niche Scanner is focused on Kaspi.kz. Product cards are generated for Kaspi, Wildberries and Ozon."},
+      {q:"Can I cancel my subscription?", a:"Yes, at any time with no penalties. Access is retained until the end of the paid period."},
+      {q:"How does the Success Fee work?", a:"3–5% is charged only on successful pool completion. If the pool doesn't fill — no fee is charged."},
+      {q:"Is there a trial period?", a:"Yes, the first 7 days are free on the Starter plan. No card required at registration."},
+    ],
+    popular_label:"Popular",
+    btn_choose:"Choose plan →", btn_choose_featured:"Get started →",
+  }
+};
+Object.keys(PAGE_I18N).forEach(l => Object.assign(RP_I18N[l], PAGE_I18N[l]));
+
+function renderPlans() {
+  const t = RP_I18N[RP_LANG];
+  document.getElementById('plansGrid').innerHTML = t.plans.map(p => `
+    <div class="plan-card${p.featured?' featured':''}">
+      ${p.popular ? `<div class="plan-popular">${t.popular_label}</div>` : ''}
+      <div class="plan-tier">${p.tier}</div>
+      <div class="plan-price">${p.price} <sup>₸</sup></div>
+      <div class="plan-period">${p.period}</div>
+      <div class="plan-desc">${p.desc}</div>
+      <ul class="plan-features">${p.features.map(f=>`<li><span class="feat-check">✓</span><span>${f}</span></li>`).join('')}</ul>
+      <a href="${p.url}" class="${p.featured?'btn-primary':'btn-secondary'} btn-block" style="padding:14px;">${p.featured?t.btn_choose_featured:t.btn_choose}</a>
+    </div>
+  `).join('');
+}
+
+function renderCompare() {
+  const t = RP_I18N[RP_LANG];
+  document.getElementById('compareBody').innerHTML = t.compare.map(row => `
+    <tr>
+      ${row.map((cell,i) => {
+        if(i===0) return `<td>${cell}</td>`;
+        const cls = i===2 ? ' class="featured-col"' : '';
+        const inner = cell==='✓' ? '<span class="c-yes">✓</span>' : cell==='—' ? '<span class="c-no">—</span>' : `<span class="c-text">${cell}</span>`;
+        return `<td${cls}>${inner}</td>`;
+      }).join('')}
+    </tr>
+  `).join('');
+}
+
+function renderFAQ() {
+  const t = RP_I18N[RP_LANG];
+  document.getElementById('faqGrid').innerHTML = t.faqs.map(f => `
+    <div class="faq-item" onclick="this.classList.toggle('open')">
+      <div class="faq-q"><span>${f.q}</span><span class="faq-icon">+</span></div>
+      <div class="faq-a"><p>${f.a}</p></div>
+    </div>
+  `).join('');
+}
+
+function onLangChange() { renderPlans(); renderCompare(); renderFAQ(); }
+renderPlans(); renderCompare(); renderFAQ();
+</script>
+</body>
+</html>

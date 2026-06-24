@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Co-Buying пулы — RetailPool AI</title>
+<link rel="stylesheet" href="assets/style.css">
+<style>
+.page-hero { padding-top: 108px; padding-bottom: 3rem; }
+
+/* ── Pool cards ────────────────────────────────────────────── */
+.pools-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(300px,1fr));
+  gap: 1.25rem; margin-top: 2.5rem;
+}
+.pool-card {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 1.5rem;
+  position: relative; overflow: hidden;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.pool-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+.pool-card-top {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  gap: 10px; margin-bottom: 0.5rem;
+}
+.pool-card-title { font-family: var(--font-display); font-size: 1.05rem; font-weight: 700; line-height: 1.3; }
+.pool-meta { font-size: 12px; color: var(--text-3); margin-bottom: 1.25rem; }
+.pool-progress-label {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-size: 13px; margin-bottom: 6px;
+}
+.pool-progress-label span { color: var(--text-2); }
+.pool-progress-label strong { font-family: var(--font-display); color: var(--text); font-size: 14px; }
+.pool-participants {
+  display: flex; align-items: center; gap: 10px; margin: 1rem 0 1.25rem;
+  font-size: 13px; color: var(--text-3);
+}
+.avatar-stack { display: flex; }
+.avatar { 
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--brand-light); color: var(--brand);
+  border: 2px solid var(--bg); margin-left: -7px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; font-family: var(--font-display);
+}
+.avatar:first-child { margin-left: 0; }
+
+/* ── Calculator ────────────────────────────────────────────── */
+.calc-section { padding: 5rem 0; background: var(--bg-2); }
+.calc-layout {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 2rem; margin-top: 2.5rem; align-items: start;
+}
+.calc-card {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--radius-xl); padding: 2rem;
+}
+.slider-group { margin-bottom: 1.75rem; }
+.slider-header {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: 10px;
+}
+.slider-label { font-size: 14px; font-weight: 500; color: var(--text-2); }
+.slider-value { font-family: var(--font-display); font-size: 1.1rem; font-weight: 700; color: var(--brand); }
+
+.calc-result {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--radius-xl); padding: 2rem;
+}
+.calc-result-title {
+  font-size: 13px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--text-3); margin-bottom: 1.5rem;
+}
+.calc-row {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-size: 14px; color: var(--text-2); padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.calc-row:last-child { border-bottom: none; }
+.calc-row-val { font-family: var(--font-display); font-weight: 700; color: var(--text); }
+.calc-row.highlight { background: var(--brand-light); border-radius: var(--radius-sm); padding: 0.85rem 1rem; margin-top: 0.5rem; border: none; }
+.calc-row.highlight .calc-row-label { color: var(--brand); font-weight: 600; }
+.calc-row.highlight .calc-row-val { color: var(--brand); font-size: 1.3rem; }
+.fee-badge {
+  display: inline-flex; align-items: center;
+  font-size: 11px; font-weight: 700; color: var(--brand);
+  background: var(--brand-light); border: 1px solid var(--brand-mid);
+  border-radius: 100px; padding: 2px 8px; margin-left: 6px;
+}
+
+/* ── How pools work ────────────────────────────────────────── */
+.how-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 1.25rem; margin-top: 2.5rem; }
+.how-card {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 1.5rem; text-align: center;
+  transition: box-shadow 0.2s;
+}
+.how-card:hover { box-shadow: var(--shadow); }
+.how-num {
+  width: 40px; height: 40px; border-radius: 12px;
+  background: var(--brand-light); color: var(--brand);
+  font-family: var(--font-display); font-size: 16px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;
+}
+.how-card h3 { font-size: 14px; font-weight: 700; margin-bottom: 0.5rem; }
+.how-card p { font-size: 13px; color: var(--text-2); line-height: 1.6; }
+
+@media (max-width: 760px) {
+  .calc-layout { grid-template-columns: 1fr; }
+  .how-grid { grid-template-columns: repeat(2,1fr); }
+}
+@media (max-width: 500px) {
+  .how-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">RetailPool AI</a>
+    <div class="nav-links" id="navLinks">
+      <a href="index.html" data-i="nav_home">Главная</a>
+      <a href="scanner.html" data-i="nav_scanner">Сканер</a>
+      <a href="pools.html" class="active" data-i="nav_pools">Пулы</a>
+      <a href="pricing.html" data-i="nav_pricing">Тарифы</a>
+    </div>
+    <div class="nav-right">
+      <div class="lang-switch">
+        <button class="lang-btn active" data-lang="ru" onclick="rpSetLang('ru')">RU</button>
+        <button class="lang-btn" data-lang="en" onclick="rpSetLang('en')">EN</button>
+      </div>
+      <a href="auth.html?view=login" class="btn-secondary" style="padding:9px 18px;font-size:14px;">Войти</a>
+      <a href="auth.html?view=register" class="btn-primary" style="padding:9px 18px;font-size:14px;">Регистрация</a>
+      <button class="nav-burger" onclick="rpToggleMobileNav()">☰</button>
+    </div>
+  </div>
+</nav>
+
+<main>
+  <section class="page-hero">
+    <div class="container">
+      <div class="section-tag" data-i="ph_tag">Co-Buying Engine</div>
+      <h1 data-i="ph_title">Совместные закупки синдиката</h1>
+      <p class="section-sub" data-i="ph_sub">Объединяйтесь с другими продавцами и закупайте товары по цене крупного опта. Платформа автоматически генерирует счета и акты для оплаты.</p>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section style="padding: 1rem 0 4rem;">
+    <div class="container">
+      <div class="section-tag" data-i="how_tag">Как работают пулы</div>
+      <h2 class="section-title" data-i="how_title">Четыре шага до оптовой цены</h2>
+      <div class="how-grid">
+        <div class="how-card" data-reveal><div class="how-num">1</div><h3 data-i="h1_h">Ниша найдена</h3><p data-i="h1_p">RetailPool AI выявляет слабое место на Kaspi.kz и открывает пул для совместной закупки.</p></div>
+        <div class="how-card" data-reveal><div class="how-num">2</div><h3 data-i="h2_h">Продавцы входят</h3><p data-i="h2_p">Вы и другие участники присоединяетесь и фиксируете нужный объём через Telegram-бот.</p></div>
+        <div class="how-card" data-reveal><div class="how-num">3</div><h3 data-i="h3_h">Оплата через Kaspi</h3><p data-i="h3_p">Бот автоматически формирует счёт для каждого участника. Оплата через Kaspi Pay — пара нажатий.</p></div>
+        <div class="how-card" data-reveal><div class="how-num">4</div><h3 data-i="h4_h">Товар на склад</h3><p data-i="h4_p">Единая поставка распределяется между участниками. Success Fee 3–5% — только при успешном закрытии.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ACTIVE POOLS -->
+  <section style="padding: 0 0 5rem;">
+    <div class="container">
+      <div class="section-tag" data-i="active_tag">Активные пулы</div>
+      <h2 class="section-title" data-i="active_title">Открытые закупки прямо сейчас</h2>
+      <div class="pools-grid" id="poolsGrid"></div>
+    </div>
+  </section>
+
+  <!-- CALCULATOR -->
+  <section class="calc-section">
+    <div class="container">
+      <div class="section-tag" data-i="calc_tag">Success Fee</div>
+      <h2 class="section-title" data-i="calc_title">Калькулятор комиссии</h2>
+      <p class="section-sub" data-i="calc_sub">Комиссия 3–5% начисляется только при успешном закрытии пула. Настройте параметры и посмотрите расчёт.</p>
+      <div class="calc-layout">
+        <div class="calc-card" data-reveal>
+          <div class="slider-group">
+            <div class="slider-header">
+              <span class="slider-label" data-i="c_amount">Сумма закупки</span>
+              <span class="slider-value" id="amountVal">500 000 ₸</span>
+            </div>
+            <input type="range" id="calcAmount" min="50000" max="5000000" step="10000" value="500000" oninput="updateCalc()">
+          </div>
+          <div class="slider-group">
+            <div class="slider-header">
+              <span class="slider-label" data-i="c_fee">Ставка комиссии</span>
+              <span class="slider-value" id="feeVal">3.0%</span>
+            </div>
+            <input type="range" id="calcFee" min="3" max="5" step="0.1" value="3" oninput="updateCalc()">
+          </div>
+          <div class="slider-group" style="margin-bottom:0">
+            <div class="slider-header">
+              <span class="slider-label" data-i="c_parts">Участников в пуле</span>
+              <span class="slider-value" id="partsVal">8</span>
+            </div>
+            <input type="range" id="calcParts" min="3" max="30" step="1" value="8" oninput="updateCalc()">
+          </div>
+        </div>
+        <div class="calc-result" data-reveal>
+          <div class="calc-result-title" data-i="c_result_title">Расчёт</div>
+          <div class="calc-row"><span class="calc-row-label" data-i="c_total">Общая сумма закупки</span><span class="calc-row-val" id="outTotal">500 000 ₸</span></div>
+          <div class="calc-row">
+            <span class="calc-row-label"><span data-i="c_success">Success Fee</span><span class="fee-badge" id="outFeePct">3.0%</span></span>
+            <span class="calc-row-val" id="outFee">15 000 ₸</span>
+          </div>
+          <div class="calc-row"><span class="calc-row-label" data-i="c_per">На участника (закупка)</span><span class="calc-row-val" id="outPer">62 500 ₸</span></div>
+          <div class="calc-row highlight"><span class="calc-row-label" data-i="c_pay">К оплате с участника</span><span class="calc-row-val" id="outPayPer">64 375 ₸</span></div>
+          <p style="font-size:12px;color:var(--text-3);margin-top:1rem;" data-i="c_note">Комиссия не взимается, если пул не набрал нужный объём.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="footer-grid">
+    <div><div class="footer-brand"><span class="nav-logo-icon" style="width:28px;height:28px;border-radius:8px;"><svg width="16" height="16" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="6.5" stroke="white" stroke-width="1.5"/><circle cx="9" cy="9" r="3.5" stroke="white" stroke-width="1.5"/><circle cx="9" cy="9" r="1.5" fill="white"/></svg></span>RetailPool AI</div><p class="footer-desc" data-i="footer_desc"></p></div>
+    <div class="footer-col"><h4 data-i="footer_product"></h4><a href="scanner.html" data-i="footer_l_scanner"></a><a href="pools.html" data-i="footer_l_pools"></a><a href="pricing.html" data-i="footer_l_pricing"></a><a href="scanner.html#demo" data-i="footer_l_demo"></a></div>
+    <div class="footer-col"><h4 data-i="footer_company"></h4><a href="#" data-i="footer_l_about"></a><a href="#" data-i="footer_l_contact"></a><a href="https://t.me/retailpoolai" target="_blank" data-i="footer_l_telegram"></a></div>
+    <div class="footer-col"><h4 data-i="footer_legal"></h4><a href="#" data-i="footer_l_privacy"></a><a href="#" data-i="footer_l_terms"></a><a href="#" data-i="footer_l_offer"></a></div>
+  </div>
+  <div class="footer-bottom"><span data-i="footer_rights"></span><span data-i="footer_built"></span></div>
+</footer>
+
+<script src="assets/common.js"></script>
+<script>
+const PAGE_I18N = {
+  ru:{
+    ph_tag:"Co-Buying Engine", ph_title:"Совместные закупки синдиката",
+    ph_sub:"Объединяйтесь с другими продавцами и закупайте товары по цене крупного опта. Платформа автоматически генерирует счета и акты для оплаты.",
+    how_tag:"Как работают пулы", how_title:"Четыре шага до оптовой цены",
+    h1_h:"Ниша найдена", h1_p:"RetailPool AI выявляет слабое место на Kaspi.kz и открывает пул для совместной закупки.",
+    h2_h:"Продавцы входят", h2_p:"Вы и другие участники присоединяетесь и фиксируете нужный объём через Telegram-бот.",
+    h3_h:"Оплата через Kaspi", h3_p:"Бот автоматически формирует счёт для каждого участника. Оплата через Kaspi Pay — пара нажатий.",
+    h4_h:"Товар на склад", h4_p:"Единая поставка распределяется между участниками. Success Fee 3–5% — только при успешном закрытии.",
+    active_tag:"Активные пулы", active_title:"Открытые закупки прямо сейчас",
+    calc_tag:"Success Fee", calc_title:"Калькулятор комиссии",
+    calc_sub:"Комиссия 3–5% начисляется только при успешном закрытии пула. Настройте параметры и посмотрите расчёт.",
+    c_amount:"Сумма закупки", c_fee:"Ставка комиссии", c_parts:"Участников в пуле",
+    c_result_title:"Расчёт", c_total:"Общая сумма закупки", c_success:"Success Fee",
+    c_per:"На участника (закупка)", c_pay:"К оплате с участника", c_note:"Комиссия не взимается, если пул не набрал нужный объём.",
+    pool_status_open:"Открыт", pool_status_closed:"Набор завершён",
+    pool_expires:"до закрытия", pool_processing:"Закупка организуется",
+    pool_participants:"участников", pool_raised:"набрано", pool_join:"Подробнее →",
+    pools:[
+      {title:"Увлажнители воздуха — модель X", target:2400000, current:1860000, status:"open", expires:18, participants:12},
+      {title:"Беспроводные наушники TWS Pro", target:1500000, current:1500000, status:"closed", expires:0, participants:9},
+      {title:"Детские конструкторы Монтессори", target:980000, current:410000, status:"open", expires:46, participants:5},
+    ],
+  },
+  en:{
+    ph_tag:"Co-Buying Engine", ph_title:"Syndicate co-buying pools",
+    ph_sub:"Join other sellers and buy products at large-wholesale prices. The platform automatically generates invoices and acts for payment.",
+    how_tag:"How pools work", how_title:"Four steps to wholesale price",
+    h1_h:"Niche found", h1_p:"RetailPool AI spots a weak point on Kaspi.kz and opens a pool for co-buying.",
+    h2_h:"Sellers join", h2_p:"You and other participants join and lock in the needed volume via the Telegram bot.",
+    h3_h:"Payment via Kaspi", h3_p:"The bot automatically generates an invoice for each participant. Payment via Kaspi Pay — a few taps.",
+    h4_h:"Goods to warehouse", h4_p:"A single shipment is distributed between participants. Success Fee 3–5% — only on successful close.",
+    active_tag:"Active pools", active_title:"Open purchases right now",
+    calc_tag:"Success Fee", calc_title:"Fee calculator",
+    calc_sub:"A 3-5% fee is charged only when a pool closes successfully. Adjust the parameters to see the breakdown.",
+    c_amount:"Purchase amount", c_fee:"Fee rate", c_parts:"Pool participants",
+    c_result_title:"Breakdown", c_total:"Total purchase amount", c_success:"Success Fee",
+    c_per:"Per participant (purchase)", c_pay:"Total per participant", c_note:"No fee charged if the pool doesn't reach the required volume.",
+    pool_status_open:"Open", pool_status_closed:"Quota filled",
+    pool_expires:"until close", pool_processing:"Order being placed",
+    pool_participants:"participants", pool_raised:"raised", pool_join:"Details →",
+    pools:[
+      {title:"Air humidifiers — model X", target:2400000, current:1860000, status:"open", expires:18, participants:12},
+      {title:"Wireless earbuds TWS Pro", target:1500000, current:1500000, status:"closed", expires:0, participants:9},
+      {title:"Montessori building sets", target:980000, current:410000, status:"open", expires:46, participants:5},
+    ],
+  }
+};
+Object.keys(PAGE_I18N).forEach(l => Object.assign(RP_I18N[l], PAGE_I18N[l]));
+
+function fmt(n) { return Math.round(n).toLocaleString('ru-RU') + ' ₸'; }
+
+function renderPools() {
+  const t = RP_I18N[RP_LANG];
+  document.getElementById('poolsGrid').innerHTML = t.pools.map(p => {
+    const pct = Math.min(100,(p.current/p.target)*100);
+    const isOpen = p.status==='open';
+    const statusPill = isOpen
+      ? `<span class="pill pill-green"><span class="pill-dot"></span>${t.pool_status_open}</span>`
+      : `<span class="pill pill-amber">${t.pool_status_closed}</span>`;
+    const expiresText = isOpen ? `${p.expires}ч ${t.pool_expires}` : t.pool_processing;
+    const initials = 'НАДТМЕАИРС';
+    const avatars = Array.from({length:Math.min(4,p.participants)},(_,i)=>`<span class="avatar">${initials[i]}</span>`).join('');
+    return `<div class="pool-card" data-reveal>
+      <div class="pool-card-top"><div class="pool-card-title">${p.title}</div>${statusPill}</div>
+      <div class="pool-meta">${expiresText}</div>
+      <div class="pool-progress-label"><span>${fmt(p.current)} / ${fmt(p.target)}</span><strong>${pct.toFixed(0)}% ${t.pool_raised}</strong></div>
+      <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+      <div class="pool-participants"><div class="avatar-stack">${avatars}</div><span>${p.participants} ${t.pool_participants}</span></div>
+      <a href="checkout.html?plan=Бизнес&price=29900" class="btn-secondary btn-block">${t.pool_join}</a>
+    </div>`;
+  }).join('');
+  rpInitReveal();
+}
+
+function updateCalc() {
+  const amount = parseFloat(document.getElementById('calcAmount').value);
+  const fee = parseFloat(document.getElementById('calcFee').value);
+  const parts = parseInt(document.getElementById('calcParts').value);
+  document.getElementById('amountVal').textContent = fmt(amount);
+  document.getElementById('feeVal').textContent = fee.toFixed(1)+'%';
+  document.getElementById('partsVal').textContent = parts;
+  const feeAmt = amount*(fee/100);
+  const perPart = amount/parts;
+  document.getElementById('outTotal').textContent = fmt(amount);
+  document.getElementById('outFeePct').textContent = fee.toFixed(1)+'%';
+  document.getElementById('outFee').textContent = fmt(feeAmt);
+  document.getElementById('outPer').textContent = fmt(perPart);
+  document.getElementById('outPayPer').textContent = fmt(perPart + feeAmt/parts);
+}
+
+function onLangChange() { renderPools(); }
+renderPools();
+updateCalc();
+</script>
+</body>
+</html>

@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Оплата — RetailPool AI</title>
+<link rel="stylesheet" href="assets/style.css">
+<style>
+.checkout-wrap {
+  padding-top: 96px; padding-bottom: 5rem;
+  max-width: 980px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1.35fr; gap: 2.5rem;
+  padding-left: 1.5rem; padding-right: 1.5rem;
+}
+
+/* ── Summary ───────────────────────────────────────────────── */
+.summary {
+  background: var(--bg-2); border: 1px solid var(--border);
+  border-radius: var(--radius-xl); padding: 1.75rem;
+  align-self: start; position: sticky; top: 80px;
+}
+.back-link {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 13px; font-weight: 500; color: var(--text-3);
+  margin-bottom: 1.5rem; transition: color 0.15s;
+}
+.back-link:hover { color: var(--brand); }
+.summary-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3); margin-bottom: 4px; }
+.summary-plan { font-family: var(--font-display); font-size: 1.6rem; font-weight: 700; margin-bottom: 1.5rem; }
+.summary-row {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-size: 14px; color: var(--text-2); padding: 0.7rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.summary-row .val { font-family: var(--font-display); font-weight: 600; color: var(--text); }
+.summary-total {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding-top: 1rem; margin-top: 0.25rem;
+  font-size: 15px; font-weight: 600; color: var(--text);
+}
+.summary-total .val { font-family: var(--font-display); font-size: 1.6rem; font-weight: 700; color: var(--brand); }
+.summary-features {
+  margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border);
+  display: flex; flex-direction: column; gap: 8px;
+}
+.summary-feature { font-size: 13px; color: var(--text-2); display: flex; align-items: center; gap: 8px; }
+.summary-feature::before { content: '✓'; color: var(--green); font-weight: 700; flex-shrink: 0; }
+.summary-note {
+  margin-top: 1.25rem; padding: 12px 14px; border-radius: var(--radius-sm);
+  background: var(--green-bg); border: 1px solid rgba(16,185,129,0.25);
+  font-size: 12px; color: var(--text-2); display: flex; gap: 8px; align-items: flex-start; line-height: 1.55;
+}
+
+/* ── Form ──────────────────────────────────────────────────── */
+.form-card {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--radius-xl); padding: 2rem;
+}
+.form-section-title {
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--text-3); margin: 0 0 1.25rem; margin-bottom: 1.25rem;
+  display: flex; align-items: center; gap: 10px;
+}
+.form-section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.card-fields { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px; }
+
+.pay-methods { display: flex; gap: 10px; margin-bottom: 1.5rem; flex-wrap: wrap; }
+.pay-method {
+  flex: 1; min-width: 120px; border: 1.5px solid var(--border); border-radius: var(--radius);
+  padding: 12px 14px; text-align: center; cursor: pointer; font-size: 13px;
+  font-weight: 600; color: var(--text-3); transition: all 0.15s; background: var(--bg);
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.pay-method:hover { border-color: var(--brand); color: var(--brand); }
+.pay-method.active { border-color: var(--brand); background: var(--brand-light); color: var(--brand); }
+
+.security-row {
+  display: flex; align-items: center; gap: 8px; margin: 1.25rem 0;
+  font-size: 12px; color: var(--text-3);
+}
+.lock-icon { color: var(--green); font-size: 14px; }
+
+.btn-pay { width: 100%; padding: 16px; font-size: 16px; border-radius: var(--radius); margin-bottom: 10px; }
+.checkout-disclaimer { font-size: 12px; color: var(--text-3); text-align: center; line-height: 1.6; }
+
+/* ── Success ───────────────────────────────────────────────── */
+.success-view { display: none; text-align: center; padding: 2rem 0; }
+.success-view.active { display: block; animation: fadein 0.5s ease; }
+@keyframes fadein { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+.success-icon {
+  width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 1.5rem;
+  background: var(--green-bg); border: 2px solid rgba(16,185,129,0.3);
+  display: flex; align-items: center; justify-content: center; font-size: 32px;
+}
+.success-view h2 { margin-bottom: 0.75rem; }
+.success-view p { color: var(--text-2); max-width: 340px; margin: 0 auto 2rem; font-size: 14px; line-height: 1.7; }
+
+@media (max-width: 780px) {
+  .checkout-wrap { grid-template-columns: 1fr; padding-top: 80px; }
+  .summary { position: static; order: 2; }
+  .form-card { order: 1; }
+  .card-fields { grid-template-columns: 1fr; }
+  .form-row { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">RetailPool AI</a>
+    <div class="nav-links" id="navLinks">
+      <a href="index.html" data-i="nav_home">Главная</a>
+      <a href="scanner.html" data-i="nav_scanner">Сканер</a>
+      <a href="pools.html" data-i="nav_pools">Пулы</a>
+      <a href="pricing.html" data-i="nav_pricing">Тарифы</a>
+    </div>
+    <div class="nav-right">
+      <div class="lang-switch">
+        <button class="lang-btn active" data-lang="ru" onclick="rpSetLang('ru')">RU</button>
+        <button class="lang-btn" data-lang="en" onclick="rpSetLang('en')">EN</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="checkout-wrap">
+  <!-- SUMMARY -->
+  <div class="summary" data-reveal>
+    <a href="pricing.html" class="back-link">← <span data-i="back">Назад к тарифам</span></a>
+    <div class="summary-label" data-i="s_label">Подписка</div>
+    <div class="summary-plan" id="summaryPlan">Бизнес</div>
+    <div class="summary-row"><span data-i="s_billing">Период оплаты</span><span class="val" data-i="s_monthly">Ежемесячно</span></div>
+    <div class="summary-row"><span data-i="s_price">Стоимость плана</span><span class="val" id="summaryPrice">29 900 ₸</span></div>
+    <div class="summary-total"><span data-i="s_total">Итого сегодня</span><span class="val" id="summaryTotal">29 900 ₸</span></div>
+    <div class="summary-features" id="summaryFeatures"></div>
+    <div class="summary-note">
+      <span>🔒</span>
+      <span data-i="s_note">Подписка автоматически продлевается. Отмените в любое время в личном кабинете.</span>
+    </div>
+  </div>
+
+  <!-- FORM -->
+  <div class="form-card" data-reveal>
+    <div class="form-view" id="formView">
+      <div class="form-section-title" data-i="f_contact">Контактные данные</div>
+      <div class="form-group"><label class="form-label" data-i="f_name">Имя и фамилия</label><input class="form-input" type="text" data-i_ph="f_name_ph" placeholder="Айбек Сатпаев"></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label" data-i="f_email">Email</label><input class="form-input" type="email" data-i_ph="f_email_ph" placeholder="aibek@company.kz"></div>
+        <div class="form-group"><label class="form-label" data-i="f_phone">Телефон</label><input class="form-input" type="tel" data-i_ph="f_phone_ph" placeholder="+7 (777) 123-45-67"></div>
+      </div>
+
+      <div class="form-section-title" data-i="f_payment">Способ оплаты</div>
+      <div class="pay-methods">
+        <div class="pay-method active" onclick="selectMethod(this)">💳 <span data-i="pm_card">Карта</span></div>
+        <div class="pay-method" onclick="selectMethod(this)">📱 <span data-i="pm_kaspi">Kaspi Pay</span></div>
+        <div class="pay-method" onclick="selectMethod(this)">🏦 <span data-i="pm_invoice">Счёт (B2B)</span></div>
+      </div>
+
+      <div id="cardFields">
+        <div class="form-group"><label class="form-label" data-i="f_card">Номер карты</label><input class="form-input" type="text" data-i_ph="f_card_ph" placeholder="0000 0000 0000 0000" maxlength="19" oninput="fmtCard(this)"></div>
+        <div class="card-fields">
+          <div class="form-group"><label class="form-label" data-i="f_expiry">Срок действия</label><input class="form-input" type="text" placeholder="MM / YY" maxlength="7" oninput="fmtExpiry(this)"></div>
+          <div class="form-group"><label class="form-label">CVV</label><input class="form-input" type="text" placeholder="•••" maxlength="4"></div>
+        </div>
+        <div class="form-group"><label class="form-label" data-i="f_holder">Держатель карты</label><input class="form-input" type="text" data-i_ph="f_holder_ph" placeholder="AIBEK SATPAYEV"></div>
+      </div>
+
+      <div class="security-row"><span class="lock-icon">🔒</span><span data-i="f_secure">Платёж защищён 256-bit SSL шифрованием</span></div>
+      <button class="btn-primary btn-pay" onclick="submitPayment()" id="payBtn">
+        <span data-i="f_pay_btn">Оплатить подписку →</span>
+      </button>
+      <p class="checkout-disclaimer" data-i="f_terms">Нажимая «Оплатить», вы соглашаетесь с условиями использования и политикой конфиденциальности.</p>
+    </div>
+
+    <div class="success-view" id="successView">
+      <div class="success-icon">✓</div>
+      <h2 data-i="succ_title">Подписка активирована!</h2>
+      <p data-i="succ_sub">Вы получите письмо с данными для входа. Telegram-бот уже ждёт вас с первыми инсайтами.</p>
+      <a href="scanner.html" class="btn-primary" style="margin:0 auto;display:inline-flex;" data-i="succ_btn">Открыть сканер →</a>
+    </div>
+  </div>
+</div>
+
+<script src="assets/common.js"></script>
+<script>
+const PAGE_I18N = {
+  ru:{
+    back:"Назад к тарифам", s_label:"Подписка", s_billing:"Период оплаты", s_monthly:"Ежемесячно",
+    s_price:"Стоимость плана", s_total:"Итого сегодня",
+    s_note:"Подписка автоматически продлевается. Отмените в любое время в личном кабинете.",
+    f_contact:"Контактные данные", f_name:"Имя и фамилия", f_name_ph:"Айбек Сатпаев",
+    f_email:"Email", f_email_ph:"aibek@company.kz",
+    f_phone:"Телефон", f_phone_ph:"+7 (777) 123-45-67",
+    f_payment:"Способ оплаты", pm_card:"Карта", pm_kaspi:"Kaspi Pay", pm_invoice:"Счёт (B2B)",
+    f_card:"Номер карты", f_card_ph:"0000 0000 0000 0000",
+    f_expiry:"Срок действия", f_holder:"Держатель карты", f_holder_ph:"AIBEK SATPAYEV",
+    f_secure:"Платёж защищён 256-bit SSL шифрованием",
+    f_pay_btn:"Оплатить подписку →",
+    f_terms:"Нажимая «Оплатить», вы соглашаетесь с условиями использования и политикой конфиденциальности.",
+    succ_title:"Подписка активирована!", succ_btn:"Открыть сканер →",
+    succ_sub:"Вы получите письмо с данными для входа. Telegram-бот уже ждёт вас с первыми инсайтами.",
+    features:{
+      "Старт":["5 отчётов Niche Scanner / мес","Smart Alerts в Telegram","1 Co-Buying пул"],
+      "Бизнес":["Безлимитные отчёты Niche Scanner","Приоритетные Smart Alerts","Безлимитные Co-Buying пулы","Kaspi + WB + Ozon"],
+      "Агентство":["Всё из Бизнес","До 10 магазинов","API-доступ","Персональный менеджер"],
+    },
+    default_features:["Безлимитные отчёты Niche Scanner","Приоритетные Smart Alerts","Безлимитные Co-Buying пулы","Kaspi + WB + Ozon"],
+  },
+  en:{
+    back:"Back to pricing", s_label:"Subscription", s_billing:"Billing period", s_monthly:"Monthly",
+    s_price:"Plan price", s_total:"Total today",
+    s_note:"Subscription renews automatically. Cancel at any time from your account.",
+    f_contact:"Contact details", f_name:"Full name", f_name_ph:"Aibek Satpayev",
+    f_email:"Email", f_email_ph:"aibek@company.kz",
+    f_phone:"Phone", f_phone_ph:"+7 (777) 123-45-67",
+    f_payment:"Payment method", pm_card:"Card", pm_kaspi:"Kaspi Pay", pm_invoice:"Invoice (B2B)",
+    f_card:"Card number", f_card_ph:"0000 0000 0000 0000",
+    f_expiry:"Expiry date", f_holder:"Cardholder name", f_holder_ph:"AIBEK SATPAYEV",
+    f_secure:"Payment secured with 256-bit SSL encryption",
+    f_pay_btn:"Pay for subscription →",
+    f_terms:"By clicking Pay you agree to the terms of service and privacy policy.",
+    succ_title:"Subscription activated!", succ_btn:"Open scanner →",
+    succ_sub:"You'll receive a login email shortly. Your Telegram bot is ready with the first insights.",
+    features:{
+      "Starter":["5 Niche Scanner reports / mo","Smart Alerts in Telegram","1 Co-Buying pool"],
+      "Business":["Unlimited Niche Scanner reports","Priority Smart Alerts","Unlimited Co-Buying pools","Kaspi + WB + Ozon"],
+      "Agency":["Everything in Business","Up to 10 stores","API access","Account manager"],
+    },
+    default_features:["Unlimited Niche Scanner reports","Priority Smart Alerts","Unlimited Co-Buying pools","Kaspi + WB + Ozon"],
+  }
+};
+Object.keys(PAGE_I18N).forEach(l => Object.assign(RP_I18N[l], PAGE_I18N[l]));
+
+function initCheckout() {
+  const params = new URLSearchParams(location.search);
+  const plan = params.get('plan') || 'Бизнес';
+  const price = params.get('price') || '29900';
+  document.getElementById('summaryPlan').textContent = plan;
+  const fmt = n => parseInt(n).toLocaleString('ru-RU') + ' ₸';
+  document.getElementById('summaryPrice').textContent = fmt(price);
+  document.getElementById('summaryTotal').textContent = fmt(price);
+  const t = RP_I18N[RP_LANG];
+  const feats = t.features[plan] || t.default_features;
+  document.getElementById('summaryFeatures').innerHTML = feats.map(f=>`<div class="summary-feature">${f}</div>`).join('');
+}
+
+function selectMethod(el) {
+  document.querySelectorAll('.pay-method').forEach(m => m.classList.remove('active'));
+  el.classList.add('active');
+  const isCard = el.querySelector('[data-i]')?.getAttribute('data-i') === 'pm_card' || el.innerText.includes('Карта') || el.innerText.includes('Card');
+  document.getElementById('cardFields').style.display = isCard ? '' : 'none';
+}
+
+function fmtCard(el) {
+  let v = el.value.replace(/\D/g,'').substring(0,16);
+  el.value = v.replace(/(.{4})/g,'$1 ').trim();
+}
+function fmtExpiry(el) {
+  let v = el.value.replace(/\D/g,'').substring(0,4);
+  if(v.length>=2) v = v.substring(0,2)+' / '+v.substring(2);
+  el.value = v;
+}
+
+function submitPayment() {
+  const btn = document.getElementById('payBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span>⏳</span>';
+  setTimeout(() => {
+    document.getElementById('formView').classList.remove('active');
+    document.getElementById('formView').style.display = 'none';
+    document.getElementById('successView').classList.add('active');
+  }, 1600);
+}
+
+function onLangChange() { initCheckout(); }
+initCheckout();
+</script>
+</body>
+</html>
